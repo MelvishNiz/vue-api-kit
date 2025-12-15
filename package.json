@@ -7,7 +7,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite build --watch",
-    "build": "vite build"
+    "build": "vite build",
+    "commit": "cz",
+    "semantic-release": "semantic-release",
+    "semantic-release-prepare": "semantic-release --dry-run --no-ci"
   },
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,6 +20,9 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "axios": "^1.13.2",
     "lodash": "^4.17.21",
@@ -26,10 +32,144 @@
     "@types/bun": "latest",
     "@types/lodash": "^4.17.21",
     "vite": "^7.2.7",
-    "vite-plugin-dts": "^4.5.4"
+    "vite-plugin-dts": "^4.5.4",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.1",
+    "commitizen": "^4.3.0",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "semantic-release": "^24.1.1"
   },
   "peerDependencies": {
     "typescript": "^5",
     "vue": "^3.3.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "releaseRules": [
+            {
+              "type": "refactor",
+              "release": "patch"
+            },
+            {
+              "type": "docs",
+              "scope": "README",
+              "release": "patch"
+            },
+            {
+              "type": "test",
+              "release": "patch"
+            },
+            {
+              "type": "style",
+              "release": "patch"
+            },
+            {
+              "type": "perf",
+              "release": "patch"
+            },
+            {
+              "type": "ci",
+              "release": "patch"
+            },
+            {
+              "type": "build",
+              "release": "patch"
+            },
+            {
+              "type": "chore",
+              "release": "patch"
+            },
+            {
+              "type": "no-release",
+              "release": false
+            }
+          ]
+        }
+      ],
+      [
+        "@semantic-release/release-notes-generator",
+        {
+          "preset": "conventionalcommits",
+          "presetConfig": {
+            "types": [
+              {
+                "type": "feat",
+                "section": ":sparkles: Features",
+                "hidden": false
+              },
+              {
+                "type": "fix",
+                "section": ":bug: Fixes",
+                "hidden": false
+              },
+              {
+                "type": "docs",
+                "section": ":memo: Documentation",
+                "hidden": false
+              },
+              {
+                "type": "style",
+                "section": ":barber: Code-style",
+                "hidden": false
+              },
+              {
+                "type": "refactor",
+                "section": ":zap: Refactor",
+                "hidden": false
+              },
+              {
+                "type": "perf",
+                "section": ":fast_forward: Performance",
+                "hidden": false
+              },
+              {
+                "type": "test",
+                "section": ":white_check_mark: Tests",
+                "hidden": false
+              },
+              {
+                "type": "ci",
+                "section": ":repeat: CI",
+                "hidden": false
+              },
+              {
+                "type": "chore",
+                "section": ":repeat: Chore",
+                "hidden": false
+              }
+            ]
+          }
+        }
+      ],
+      "@semantic-release/github",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "package.json",
+            "bun.lock",
+            "CHANGELOG.md"
+          ],
+          "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
+        }
+      ]
+    ]
   }
 }
