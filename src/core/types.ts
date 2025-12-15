@@ -39,7 +39,9 @@ export interface ApiClientOptions<
   withCredentials?: boolean;
   queries?: Q;
   mutations?: M;
-  beforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | any;
+  onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | any;
+  onStartRequest?: () => Promise<void>;
+  onFinishRequest?: () => Promise<void>;
   onErrorRequest?: (error: { message: string; status?: number; code?: string, data?: any }) => void;
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
 }

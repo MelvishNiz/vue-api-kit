@@ -27,11 +27,11 @@ export function createApiClient<
 
   /* ------------------------- BEFORE REQUEST HANDLER ------------------------ */
 
-  if (options.beforeRequest) {
+  if (options.onBeforeRequest) {
     client.interceptors.request.use(
       async (config) => {
         try {
-          const modifiedConfig = await options.beforeRequest!(config);
+          const modifiedConfig = await options.onBeforeRequest!(config);
           return modifiedConfig || config;
         } catch (error) {
           return Promise.reject(error);
@@ -40,6 +40,35 @@ export function createApiClient<
       (error) => Promise.reject(error)
     );
   }
+
+  /* ----------------------------- LOADING HANDLER --------------------------- */
+
+  if (options.onStartRequest) {
+    client.interceptors.request.use(
+      async (config) => {
+        try {
+          await options.onStartRequest!();
+          return config;
+        } catch (error) {
+          return Promise.reject(error);
+        }
+      },
+      (error) => Promise.reject(error)
+    );
+  }
+
+  if (options.onFinishRequest) {
+    client.interceptors.response.use(
+      (response) => {
+        options.onFinishRequest!();
+        return response;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+  }
+
 
   /* --------------------------- PATH PARAM HANDLER -------------------------- */
 

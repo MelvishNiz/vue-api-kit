@@ -6,8 +6,14 @@ export const useApi = createApiClient({
     "access-control-allow-origin": "*",
   },
   withCredentials: true,
-  beforeRequest: async (config) => {
+  onBeforeRequest: async (config) => {
     config.headers.Authorization = "Bearer demo-token";
+  },
+  onStartRequest: async () => {
+    console.log("Request started");
+  },
+  onFinishRequest: async () => {
+    console.log("Request finished");
   },
   onErrorRequest({message, status, code, data}) {
     console.log("message", message);
