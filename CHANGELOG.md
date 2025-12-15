@@ -1,3 +1,19 @@
+## [1.1.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.0.0...v1.1.0) (2025-12-15)
+
+### :sparkles: Features
+
+* Add npm update step to release workflow for latest package management ([adcd03b](https://github.com/MelvishNiz/vue-api-kit/commit/adcd03b3560fc5e7dae4b0827a1133729a4819b4))
+* Enhance API client with request lifecycle hooks for better logging and control ([4a6fd07](https://github.com/MelvishNiz/vue-api-kit/commit/4a6fd078a7e89af8ff3fe9eef79d27e00b2b2886))
+* Update README and code documentation for improved clarity and usage examples ([98c54df](https://github.com/MelvishNiz/vue-api-kit/commit/98c54df44cc31ecd9012d5f67c1475275b20ad51))
+
+### :bug: Fixes
+
+* Remove local dependency on vue-api-kit from package.json ([35aa4ff](https://github.com/MelvishNiz/vue-api-kit/commit/35aa4ff231365219f57277f4944d14815722ad51))
+
+### :zap: Refactor
+
+* Update error handling to use errorMessage instead of error across components and API client ([62963a8](https://github.com/MelvishNiz/vue-api-kit/commit/62963a849d0da5c9d7d2f7be120e862a5950df6b))
+
 ## 1.0.0 (2025-12-15)
 
 ### :sparkles: Features
