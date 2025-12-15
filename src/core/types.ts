@@ -3,10 +3,34 @@ import type { Ref } from "vue";
 import type { ZodError, ZodType } from "zod";
 import type { $ZodIssue } from "zod/v4/core";
 
+/**
+ * HTTP methods supported by the API client
+ * @example
+ * const method: HTTPMethod = "GET";
+ */
 export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
+/**
+ * Infer TypeScript type from Zod schema
+ * @template T - Zod schema type
+ * @example
+ * const userSchema = z.object({ id: z.number(), name: z.string() });
+ * type User = Infer<typeof userSchema>; // { id: number; name: string }
+ */
 export type Infer<T> = T extends ZodType<infer U> ? U : any;
 
+/**
+ * Defines a query (GET request) endpoint configuration
+ * @template TParams - Zod schema for query parameters
+ * @template TResponse - Zod schema for response data
+ * @example
+ * const getUsers: ApiQuery = {
+ *   method: "GET",
+ *   path: "/users",
+ *   params: z.object({ page: z.number() }),
+ *   response: z.array(z.object({ id: z.number(), name: z.string() }))
+ * };
+ */
 export interface ApiQuery<
   TParams extends ZodType<any> | undefined = ZodType<any> | undefined,
   TResponse extends ZodType<any> | undefined = ZodType<any> | undefined
@@ -17,6 +41,19 @@ export interface ApiQuery<
   response?: TResponse;
 }
 
+/**
+ * Defines a mutation (POST, PUT, PATCH, DELETE) endpoint configuration
+ * @template TData - Zod schema for request body
+ * @template TResponse - Zod schema for response data
+ * @template TParams - Zod schema for path/query parameters
+ * @example
+ * const createUser: ApiMutation = {
+ *   method: "POST",
+ *   path: "/users",
+ *   data: z.object({ name: z.string(), email: z.string().email() }),
+ *   response: z.object({ id: z.number(), name: z.string(), email: z.string() })
+ * };
+ */
 export interface ApiMutation<
   TData extends ZodType<any> | undefined = ZodType<any> | undefined,
   TResponse extends ZodType<any> | undefined = ZodType<any> | undefined,
@@ -30,6 +67,19 @@ export interface ApiMutation<
   isMultipart?: boolean;
 }
 
+/**
+ * Configuration options for creating an API client
+ * @template Q - Record of query endpoint definitions
+ * @template M - Record of mutation endpoint definitions
+ * @example
+ * const options: ApiClientOptions = {
+ *   baseURL: "https://api.example.com",
+ *   headers: { Authorization: "Bearer token" },
+ *   queries: { getUsers: { path: "/users" } },
+ *   mutations: { createUser: { method: "POST", path: "/users" } },
+ *   onErrorRequest: (error) => console.error(error.message)
+ * };
+ */
 export interface ApiClientOptions<
   Q extends Record<string, ApiQuery> = Record<string, ApiQuery>,
   M extends Record<string, ApiMutation> = Record<string, ApiMutation>
@@ -46,6 +96,19 @@ export interface ApiClientOptions<
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
 }
 
+/**
+ * Options for configuring a query hook
+ * @template TParams - Type of query parameters
+ * @template TResult - Type of result data
+ * @example
+ * const options: UseQueryOptions = {
+ *   params: { page: 1 },
+ *   loadOnMount: true,
+ *   debounce: 300,
+ *   onResult: (data) => console.log(data),
+ *   onError: (error) => console.error(error)
+ * };
+ */
 export interface UseQueryOptions<TParams = any, TResult = any> {
   params?: TParams;
   loadOnMount?: boolean;
@@ -55,6 +118,16 @@ export interface UseQueryOptions<TParams = any, TResult = any> {
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
 }
 
+/**
+ * Options for configuring a mutation hook
+ * @template TResult - Type of result data
+ * @example
+ * const options: UseMutationOptions = {
+ *   onResult: (data) => console.log("Success:", data),
+ *   onError: (error) => console.error("Error:", error),
+ *   onUploadProgress: (progress) => console.log(`Upload: ${progress}%`)
+ * };
+ */
 export interface UseMutationOptions<TResult = any> {
   onResult?: (result: TResult) => void;
   onError?: (error: AxiosError | ZodError | Error) => void;
@@ -62,6 +135,16 @@ export interface UseMutationOptions<TResult = any> {
   onUploadProgress?: (progress: number) => void;
 }
 
+/**
+ * Return type from a query hook
+ * @template TResult - Type of result data
+ * @example
+ * const { result, isLoading, errorMessage, refetch } = useGetUsers();
+ * // result.value contains the data
+ * // isLoading.value indicates loading state
+ * // errorMessage.value contains any error message
+ * // refetch() to manually trigger a new request
+ */
 export interface QueryResult<TResult> {
   result: Ref<TResult | undefined>;
   errorMessage: Ref<string | undefined>;
@@ -71,6 +154,18 @@ export interface QueryResult<TResult> {
   refetch: () => Promise<void>;
 }
 
+/**
+ * Return type from a mutation hook
+ * @template TResult - Type of result data
+ * @template TData - Type of mutation input data
+ * @example
+ * const { mutate, isLoading, result, errorMessage } = useCreateUser();
+ * // Call mutate() to trigger the mutation
+ * await mutate({ name: "John", email: "john@example.com" });
+ * // result.value contains the response
+ * // isLoading.value indicates loading state
+ * // uploadProgress.value shows upload progress (0-100)
+ */
 export interface MutationResult<TResult, TData> {
   result: Ref<TResult | undefined>;
   errorMessage: Ref<string | undefined>;

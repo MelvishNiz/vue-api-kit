@@ -11,6 +11,48 @@ const { debounce } = pkg;
 /*                              CREATE API CLIENT                              */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Creates a type-safe API client with query and mutation hooks for Vue 3
+ * @template Q - Record of query endpoint definitions
+ * @template M - Record of mutation endpoint definitions
+ * @param {ApiClientOptions<Q, M>} options - Configuration options for the API client
+ * @returns {Object} API client with query and mutation hooks
+ * @example
+ * import { createApiClient } from 'vue-api-kit';
+ * import { z } from 'zod';
+ *
+ * const api = createApiClient({
+ *   baseURL: 'https://jsonplaceholder.typicode.com',
+ *   queries: {
+ *     getUsers: {
+ *       path: '/users',
+ *       response: z.array(z.object({
+ *         id: z.number(),
+ *         name: z.string()
+ *       }))
+ *     }
+ *   },
+ *   mutations: {
+ *     createUser: {
+ *       method: 'POST',
+ *       path: '/users',
+ *       data: z.object({
+ *         name: z.string(),
+ *         email: z.string().email()
+ *       }),
+ *       response: z.object({
+ *         id: z.number(),
+ *         name: z.string(),
+ *         email: z.string()
+ *       })
+ *     }
+ *   }
+ * });
+ *
+ * // In your Vue component:
+ * const { result, isLoading } = api.query.getUsers();
+ * const { mutate } = api.mutation.createUser();
+ */
 export function createApiClient<
   Q extends Record<string, ApiQuery>,
   M extends Record<string, ApiMutation>

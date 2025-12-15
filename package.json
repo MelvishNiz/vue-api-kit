@@ -1,10 +1,29 @@
 {
   "name": "vue-api-kit",
-  "version": "1.0.0",
-  "author": {
-    "name": "MelvishNiz"
-  },
   "type": "module",
+  "version": "1.0.0",
+  "description": "A powerful and flexible API client for Vue 3 applications, built with TypeScript and Zod for type-safe API interactions.",
+  "keywords": [
+    "vue3",
+    "api-client",
+    "typescript",
+    "zod",
+    "axios",
+    "vue",
+    "http",
+    "rest",
+    "api",
+    "sdk"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "MelvishNiz",
+    "url": "https://github.com/MelvishNiz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MelvishNiz/vue-api-kit.git"
+  },
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build",
