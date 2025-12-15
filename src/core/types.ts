@@ -1,74 +1,80 @@
-import { type AxiosResponse } from "axios";
-import { type Ref } from "vue";
+import type { InternalAxiosRequestConfig } from "axios";
+import type { Ref } from "vue";
+import type { ZodType } from "zod";
+import type { $ZodIssue } from "zod/v4/core";
 
-export type QueryRequest<T, P> = ({params, signal}: {params?: P; signal?: AbortSignal}) => Promise<AxiosResponse<T>>;
-export type MutationRequest<T, P> = ({params}: {params?: P}) => Promise<AxiosResponse<T>>;
-export type Callback<T> = (data: T) => void;
-export type ErrorCallback = (error: string) => void;
-export type ErrorValidationCallback = (errors: ApiValidationError[]) => void;
-export interface ApiValidationError {
-  field: string;
-  message: string;
-}
-export interface ApiPagination {
-  current_page: number;
-  from: number;
-  has_next_page: boolean;
-  has_previous_page: boolean;
-  last_page: number;
-  page_size: number;
-  to: number;
-  total: number;
-}
-export interface ApiPaginationParams {
-  page?: number;
-  page_size?: number;
-  search?: string;
-}
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  message: string;
-  data?: T;
-  meta?: {
-    validation_errors?: ApiValidationError[];
-    pagination?: ApiPagination;
-  };
+export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+export type Infer<T> = T extends ZodType<infer U> ? U : any;
+
+export interface ApiQuery<
+  TParams extends ZodType<any> | undefined = ZodType<any> | undefined,
+  TResponse extends ZodType<any> | undefined = ZodType<any> | undefined
+> {
+  method?: Extract<HTTPMethod, "GET">;
+  path: string;
+  params?: TParams;
+  response?: TResponse;
 }
 
-export interface UseQueryOption<T, PARAMS = unknown> {
-  /**
-   * Whether to load the query on mount.
-   * @default true
-   */
+export interface ApiMutation<
+  TData extends ZodType<any> | undefined = ZodType<any> | undefined,
+  TResponse extends ZodType<any> | undefined = ZodType<any> | undefined,
+  TParams extends ZodType<any> | undefined = ZodType<any> | undefined
+> {
+  method: HTTPMethod;
+  path: string;
+  params?: TParams;
+  data?: TData;
+  response?: TResponse;
+  isMultipart?: boolean;
+}
+
+export interface ApiClientOptions<
+  Q extends Record<string, ApiQuery> = Record<string, ApiQuery>,
+  M extends Record<string, ApiMutation> = Record<string, ApiMutation>
+> {
+  baseURL: string;
+  headers?: Record<string, string>;
+  withCredentials?: boolean;
+  queries?: Q;
+  mutations?: M;
+  beforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | any;
+  onError?: (error: { message: string; status?: number; code?: string, data?: any }) => void;
+  onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
+}
+
+export interface UseQueryOptions<TParams = any> {
+  params?: TParams;
   loadOnMount?: boolean;
-  params?: PARAMS;
-  onData?: Callback<T>;
-  onError?: ErrorCallback;
-  onValidationError?: ErrorValidationCallback;
-  /**
-   * Debounce time in milliseconds.
-   * @default undefined
-   */
   debounce?: number;
+  onResult?: (data: any) => void;
+  onError?: (error: string) => void;
+  onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
 }
-export interface UseMutationOption<T, PARAMS = unknown, BODY = unknown> {
-  body?: BODY;
-  params?: PARAMS;
-  onData?: Callback<T>;
-  onError?: ErrorCallback;
-  onValidationError?: ErrorValidationCallback;
+
+export interface UseMutationOptions<_TData = any> {
+  onResult?: (data: any) => void;
+  onError?: (error: string) => void;
+  onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
+  onUploadProgress?: (progress: number) => void;
 }
-export interface UseQueryResult<T> {
+
+export interface QueryResult<T> {
   result: Ref<T | undefined>;
   error: Ref<string | undefined>;
+  zodErrors: Ref<Omit<$ZodIssue, "input">[] | undefined>;
   isLoading: Ref<boolean>;
   isDone: Ref<boolean>;
   refetch: () => Promise<void>;
 }
-export interface UseMutationResult<T> {
+
+export interface MutationResult<T, TData> {
   result: Ref<T | undefined>;
   error: Ref<string | undefined>;
+  zodErrors: Ref<Omit<$ZodIssue, "input">[] | undefined>;
   isLoading: Ref<boolean>;
   isDone: Ref<boolean>;
-  execute: (data?: Record<string, unknown>) => Promise<void>;
+  uploadProgress: Ref<number>;
+  mutate: (data: TData & { params?: any }) => Promise<void>;
 }
