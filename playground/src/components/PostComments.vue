@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useApi } from '../api-client';
 
 const postId = ref('1');
-const { result: comments, isLoading, error, refetch } = useApi.query.comments({
+const { result: comments, isLoading, errorMessage, refetch } = useApi.query.comments({
   params: { postId: postId.value },
   loadOnMount: true,
 });
@@ -19,13 +19,13 @@ const handleFetchComments = () => {
 
     <div class="mb-6 flex items-center gap-4">
       <label class="text-gray-700 font-medium">Post ID:</label>
-      <input 
+      <input
         v-model="postId"
         type="text"
         placeholder="Enter post ID"
         class="flex-1 max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
-      <button 
+      <button
         @click="handleFetchComments"
         :disabled="isLoading || !postId"
         class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -38,15 +38,15 @@ const handleFetchComments = () => {
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
     </div>
 
-    <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+    <div v-else-if="errorMessage" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
       <p class="font-medium">Error loading comments</p>
-      <p class="text-sm mt-1">{{ error }}</p>
+      <p class="text-sm mt-1">{{ errorMessage }}</p>
     </div>
 
     <div v-else-if="comments && comments.length > 0" class="space-y-4">
       <p class="text-sm text-gray-600 mb-4">Found {{ comments.length }} comments</p>
-      <div 
-        v-for="comment in comments" 
+      <div
+        v-for="comment in comments"
         :key="comment.id"
         class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
       >

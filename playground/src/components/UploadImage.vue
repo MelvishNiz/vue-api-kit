@@ -6,12 +6,12 @@ const selectedFile = ref<File | null>(null);
 const previewUrl = ref<string | null>(null);
 
 // This is a demo - you'll need to add this mutation to api-client.ts
-const { result, isLoading, error, uploadProgress, mutate } = useApiUpload.mutation.uploadImage({
+const { result, isLoading, errorMessage, uploadProgress, mutate } = useApiUpload.mutation.uploadImage({
   onResult: (data: any) => {
     console.log('Image uploaded:', data);
     resetForm();
   },
-  onError: (error: string) => {
+  onError: (error) => {
     console.error('Error uploading image:', error);
   },
   onUploadProgress: (progress: number) => {
@@ -22,21 +22,21 @@ const { result, isLoading, error, uploadProgress, mutate } = useApiUpload.mutati
 const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
-  
+
   if (file) {
     if (!file.type.startsWith('image/')) {
-      error.value = 'Please select an image file';
+      errorMessage.value = 'Please select an image file';
       return;
     }
-    
+
     if (file.size > 5 * 1024 * 1024) { // 5MB
-      error.value = 'File size must be less than 5MB';
+      errorMessage.value = 'File size must be less than 5MB';
       return;
     }
-    
+
     selectedFile.value = file;
-    error.value = undefined;
-    
+    errorMessage.value = undefined;
+
     // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -48,7 +48,7 @@ const handleFileChange = (event: Event) => {
 
 const handleSubmit = async () => {
   if (!selectedFile.value) {
-    error.value = 'Please select a file';
+    errorMessage.value = 'Please select a file';
     return;
   }
   mutate({
@@ -76,10 +76,10 @@ const removeFile = () => {
       <!-- File Upload Area -->
       <div>
         <label class="block text-gray-700 font-medium mb-2">Image File</label>
-        
+
         <div v-if="!selectedFile" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
-          <input 
-            type="file" 
+          <input
+            type="file"
             @change="handleFileChange"
             accept="image/*"
             class="hidden"
@@ -107,12 +107,12 @@ const removeFile = () => {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-          
+
           <div class="flex items-center gap-4">
-            <img 
-              v-if="previewUrl" 
-              :src="previewUrl" 
-              alt="Preview" 
+            <img
+              v-if="previewUrl"
+              :src="previewUrl"
+              alt="Preview"
               class="w-32 h-32 object-cover rounded-lg"
             />
             <div class="flex-1">
@@ -130,7 +130,7 @@ const removeFile = () => {
           <span>{{ uploadProgress }}%</span>
         </div>
         <div class="w-full bg-gray-200 rounded-full h-2.5">
-          <div 
+          <div
             class="bg-blue-500 h-2.5 rounded-full transition-all duration-300"
             :style="{ width: uploadProgress + '%' }"
           ></div>
@@ -139,14 +139,14 @@ const removeFile = () => {
 
       <!-- Submit Button -->
       <div class="flex gap-3">
-        <button 
+        <button
           type="submit"
           :disabled="isLoading || !selectedFile"
           class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
         >
           {{ isLoading ? 'Uploading...' : 'Upload Image' }}
         </button>
-        <button 
+        <button
           type="button"
           @click="resetForm"
           :disabled="isLoading"
@@ -158,9 +158,9 @@ const removeFile = () => {
     </form>
 
     <!-- Error Message -->
-    <div v-if="error" class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+    <div v-if="errorMessage" class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
       <p class="font-medium">Error</p>
-      <p class="text-sm mt-1">{{ error }}</p>
+      <p class="text-sm mt-1">{{ errorMessage }}</p>
     </div>
 
     <!-- Success Message -->

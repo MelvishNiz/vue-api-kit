@@ -9,7 +9,7 @@ export const useApi = createApiClient({
   beforeRequest: async (config) => {
     config.headers.Authorization = "Bearer demo-token";
   },
-  onError({message, status, code,data}) {
+  onErrorRequest({message, status, code, data}) {
     console.log("message", message);
     console.log("status", status);
     console.log("code", code);
@@ -65,7 +65,7 @@ export const useApi = createApiClient({
       }),
       response: z.object({
         id: z.number(),
-        title: z.string(), 
+        title: z.string(),
         body: z.string(),
         userId: z.number(),
       }),
@@ -83,7 +83,7 @@ export const useApi = createApiClient({
       }),
       response: z.object({
         id: z.number(),
-        title: z.string(), 
+        title: z.string(),
         body: z.string(),
         userId: z.number(),
       }),

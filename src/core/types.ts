@@ -1,6 +1,6 @@
-import type { InternalAxiosRequestConfig } from "axios";
+import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 import type { Ref } from "vue";
-import type { ZodType } from "zod";
+import type { ZodError, ZodType } from "zod";
 import type { $ZodIssue } from "zod/v4/core";
 
 export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -40,38 +40,38 @@ export interface ApiClientOptions<
   queries?: Q;
   mutations?: M;
   beforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | any;
-  onError?: (error: { message: string; status?: number; code?: string, data?: any }) => void;
+  onErrorRequest?: (error: { message: string; status?: number; code?: string, data?: any }) => void;
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
 }
 
-export interface UseQueryOptions<TParams = any> {
+export interface UseQueryOptions<TParams = any, TResult = any> {
   params?: TParams;
   loadOnMount?: boolean;
   debounce?: number;
-  onResult?: (data: any) => void;
-  onError?: (error: string) => void;
+  onResult?: (result: TResult) => void;
+  onError?: (error: AxiosError | ZodError | Error) => void;
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
 }
 
-export interface UseMutationOptions<_TData = any> {
-  onResult?: (data: any) => void;
-  onError?: (error: string) => void;
+export interface UseMutationOptions<TResult = any> {
+  onResult?: (result: TResult) => void;
+  onError?: (error: AxiosError | ZodError | Error) => void;
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
   onUploadProgress?: (progress: number) => void;
 }
 
-export interface QueryResult<T> {
-  result: Ref<T | undefined>;
-  error: Ref<string | undefined>;
+export interface QueryResult<TResult> {
+  result: Ref<TResult | undefined>;
+  errorMessage: Ref<string | undefined>;
   zodErrors: Ref<Omit<$ZodIssue, "input">[] | undefined>;
   isLoading: Ref<boolean>;
   isDone: Ref<boolean>;
   refetch: () => Promise<void>;
 }
 
-export interface MutationResult<T, TData> {
-  result: Ref<T | undefined>;
-  error: Ref<string | undefined>;
+export interface MutationResult<TResult, TData> {
+  result: Ref<TResult | undefined>;
+  errorMessage: Ref<string | undefined>;
   zodErrors: Ref<Omit<$ZodIssue, "input">[] | undefined>;
   isLoading: Ref<boolean>;
   isDone: Ref<boolean>;

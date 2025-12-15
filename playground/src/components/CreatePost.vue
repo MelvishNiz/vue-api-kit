@@ -6,8 +6,8 @@ const title = ref('');
 const body = ref('');
 const userId = ref(1);
 
-const { result, isLoading, error, mutate } = useApi.mutation.createPost({
-  onResult: (data: any) => {
+const { result, isLoading, errorMessage, mutate } = useApi.mutation.createPost({
+  onResult: (data) => {
     console.log('Post created:', data);
     // Reset form
     title.value = '';
@@ -17,7 +17,7 @@ const { result, isLoading, error, mutate } = useApi.mutation.createPost({
   onZodError(issues) {
     console.log(issues[0]?.message);
   },
-  onError: (error: string) => {
+  onError: (error) => {
     console.error('Error creating post:', error);
   }
 });
@@ -42,7 +42,7 @@ const handleSubmit = () => {
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <div>
         <label class="block text-gray-700 font-medium mb-2">Title</label>
-        <input 
+        <input
           v-model="title"
           type="text"
           placeholder="Enter post title"
@@ -53,7 +53,7 @@ const handleSubmit = () => {
 
       <div>
         <label class="block text-gray-700 font-medium mb-2">Body</label>
-        <textarea 
+        <textarea
           v-model="body"
           placeholder="Enter post content"
           required
@@ -64,7 +64,7 @@ const handleSubmit = () => {
 
       <div>
         <label class="block text-gray-700 font-medium mb-2">User ID</label>
-        <input 
+        <input
           v-model.number="userId"
           type="number"
           min="1"
@@ -73,7 +73,7 @@ const handleSubmit = () => {
         />
       </div>
 
-      <button 
+      <button
         type="submit"
         :disabled="isLoading || !title || !body"
         class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
@@ -82,9 +82,9 @@ const handleSubmit = () => {
       </button>
     </form>
 
-    <div v-if="error" class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+    <div v-if="errorMessage" class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
       <p class="font-medium">Error creating post</p>
-      <p class="text-sm mt-1">{{ error }}</p>
+      <p class="text-sm mt-1">{{ errorMessage }}</p>
     </div>
 
     <div v-if="result" class="mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">

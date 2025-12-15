@@ -87,7 +87,7 @@ export function createApiClient<
   const queriesDef = options.queries ?? ({} as Q);
   const useQueries = {} as {
     [K in keyof Q]: (
-      options?: UseQueryOptions<Infer<Q[K]["params"]>>
+      options?: UseQueryOptions<Infer<Q[K]["params"]>, Infer<Q[K]["response"]>>
     ) => QueryResult<Infer<Q[K]["response"]>>;
   };
 
@@ -113,7 +113,7 @@ export function createApiClient<
       }
 
       const data = ref<any>();
-      const error = ref<string | undefined>();
+      const errorMessage = ref<string | undefined>();
       const zodErrors = ref<Omit<$ZodIssue, "input">[] | undefined>();
       const isLoading = ref(false);
       const isDone = ref(false);
@@ -130,7 +130,7 @@ export function createApiClient<
           cancel();
         }
         isLoading.value = true;
-        error.value = undefined;
+        errorMessage.value = undefined;
 
         try {
           if (q.params && queryOptions?.params) {
@@ -157,15 +157,13 @@ export function createApiClient<
               const status = err.response?.status;
               const code = err.code;
               const data = err.response?.data;
-              error.value = message;
+              errorMessage.value = message;
 
               // Call local error handler
-              queryOptions?.onError?.(message);
+              queryOptions?.onError?.(err);
 
               // Call global error handler
-              if (options.onError) {
-                options.onError({ message, status, code, data });
-              }
+              options.onErrorRequest?.({ message, status, code, data });
             }
           } else if (err instanceof ZodError) {
             // Handle Zod validation errors
@@ -174,18 +172,16 @@ export function createApiClient<
               `${e.path.join('.')}: ${e.message}`
             ).join(', ');
             const message = `Validation error: ${validationMessages}`;
-            error.value = message;
+            errorMessage.value = message;
 
             // Call local error handler with formatted validation errors
-            queryOptions?.onError?.(message);
+            queryOptions?.onError?.(err);
 
             // Call local Zod error handler
             queryOptions?.onZodError?.(zodErrors.value);
 
             // Call global error handler
-            if (options.onError) {
-              options.onError({ message, code: 'VALIDATION_ERROR' });
-            }
+            options.onErrorRequest?.({ message, code: 'VALIDATION_ERROR' });
 
             // Call global Zod error handler
             if (options.onZodError) {
@@ -193,11 +189,9 @@ export function createApiClient<
             }
           } else {
             const message = err.message || "An error occurred";
-            error.value = message;
+            errorMessage.value = message;
             queryOptions?.onError?.(message);
-            if (options.onError) {
-              options.onError({ message });
-            }
+            options.onErrorRequest?.({ message });
           }
         } finally {
           isLoading.value = false;
@@ -237,7 +231,7 @@ export function createApiClient<
         }
       }
 
-      return { result: data, error, zodErrors, isLoading, isDone, refetch };
+      return { result: data, errorMessage, zodErrors, isLoading, isDone, refetch };
     };
   }
 
@@ -247,7 +241,7 @@ export function createApiClient<
   const mutationsDef = options.mutations ?? ({} as M);
   const useMutations = {} as {
     [K in keyof M]: (
-      options?: UseMutationOptions
+      options?: UseMutationOptions<Infer<M[K]["response"]>>
     ) => MutationResult<Infer<M[K]["response"]>, Infer<M[K]["data"]>>;
   };
 
@@ -257,7 +251,7 @@ export function createApiClient<
 
     useMutations[key] = (mutationOptions?: UseMutationOptions) => {
       const data = ref<any>();
-      const error = ref<string | undefined>();
+      const errorMessage = ref<string | undefined>();
       const zodErrors = ref<Omit<$ZodIssue, "input">[] | undefined>();
       const isLoading = ref(false);
       const isDone = ref(false);
@@ -266,7 +260,7 @@ export function createApiClient<
       const mutate = async (mutationData: any) => {
         if (isLoading.value) return;
         isLoading.value = true;
-        error.value = undefined;
+        errorMessage.value = undefined;
         uploadProgress.value = 0;
 
         try {
@@ -337,15 +331,13 @@ export function createApiClient<
             const message = err.response?.data?.message || err.message || "An error occurred";
             const status = err.response?.status;
             const code = err.code;
-            error.value = message;
+            errorMessage.value = message;
 
             // Call local error handler
-            mutationOptions?.onError?.(message);
+            mutationOptions?.onError?.(err);
 
             // Call global error handler
-            if (options.onError) {
-              options.onError({ message, status, code });
-            }
+            options.onErrorRequest?.({ message, status, code });
           } else if (err instanceof ZodError) {
             // Handle Zod validation errors
             zodErrors.value = err.issues || [];
@@ -353,18 +345,16 @@ export function createApiClient<
               `${e.path.join('.')}: ${e.message}`
             ).join(', ');
             const message = `Validation error: ${validationMessages}`;
-            error.value = message;
+            errorMessage.value = message;
 
             // Call local error handler with formatted validation errors
-            mutationOptions?.onError?.(message);
+            mutationOptions?.onError?.(err);
 
             // Call local Zod error handler
             mutationOptions?.onZodError?.(zodErrors.value);
 
             // Call global error handler
-            if (options.onError) {
-              options.onError({ message, code: 'VALIDATION_ERROR' });
-            }
+            options.onErrorRequest?.({ message, code: 'VALIDATION_ERROR' });
 
             // Call global Zod error handler
             if (options.onZodError) {
@@ -372,11 +362,9 @@ export function createApiClient<
             }
           } else {
             const message = err.message || "An error occurred";
-            error.value = message;
-            mutationOptions?.onError?.(message);
-            if (options.onError) {
-              options.onError({ message });
-            }
+            errorMessage.value = message;
+            mutationOptions?.onError?.(err);
+            options.onErrorRequest?.({ message });
           }
         } finally {
           isLoading.value = false;
@@ -384,7 +372,7 @@ export function createApiClient<
         }
       };
 
-      return { result: data, error, zodErrors, isLoading, isDone, uploadProgress, mutate };
+      return { result: data, errorMessage, zodErrors, isLoading, isDone, uploadProgress, mutate };
     };
   }
 

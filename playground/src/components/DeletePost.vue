@@ -5,12 +5,12 @@ import { useApi } from '../api-client';
 const postId = ref(1);
 const showConfirm = ref(false);
 
-const { result, isLoading, error, mutate } = useApi.mutation.deletePost({
+const { result, isLoading, errorMessage, mutate } = useApi.mutation.deletePost({
   onResult: () => {
     console.log('Post deleted');
     showConfirm.value = false;
   },
-  onError: (error: string) => {
+  onError: (error) => {
     console.error('Error deleting post:', error);
   }
 });
@@ -29,7 +29,7 @@ const handleDelete = () => {
     <div class="space-y-4">
       <div>
         <label class="block text-gray-700 font-medium mb-2">Post ID</label>
-        <input 
+        <input
           v-model.number="postId"
           type="number"
           min="1"
@@ -39,7 +39,7 @@ const handleDelete = () => {
       </div>
 
       <div v-if="!showConfirm">
-        <button 
+        <button
           @click="showConfirm = true"
           class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
         >
@@ -52,14 +52,14 @@ const handleDelete = () => {
           Are you sure you want to delete post #{{ postId }}?
         </p>
         <div class="flex gap-3">
-          <button 
+          <button
             @click="handleDelete"
             :disabled="isLoading"
             class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
           >
             {{ isLoading ? 'Deleting...' : 'Yes, Delete' }}
           </button>
-          <button 
+          <button
             @click="showConfirm = false"
             :disabled="isLoading"
             class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition-colors font-medium"
@@ -70,9 +70,9 @@ const handleDelete = () => {
       </div>
     </div>
 
-    <div v-if="error" class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+    <div v-if="errorMessage" class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
       <p class="font-medium">Error deleting post</p>
-      <p class="text-sm mt-1">{{ error }}</p>
+      <p class="text-sm mt-1">{{ errorMessage }}</p>
     </div>
 
     <div v-if="result" class="mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">

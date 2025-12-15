@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useApi } from '../api-client';
 
-const { result: posts, isLoading, error, refetch } = useApi.query.posts({
+const { result: posts, isLoading, errorMessage, refetch } = useApi.query.posts({
   loadOnMount: true,
-  onResult: (data: any) => {
+  onResult: (data) => {
     console.log('Posts loaded:', data.length);
   },
-  onError: (error: string) => {
-    console.error('Error loading posts:', error);
+  onError: (error) => {
+    console.error('Error loading posts:', error.message);
   }
 });
 </script>
@@ -16,7 +16,7 @@ const { result: posts, isLoading, error, refetch } = useApi.query.posts({
   <div class="bg-white rounded-lg shadow-md p-6">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-bold text-gray-800">All Posts</h2>
-      <button 
+      <button
         @click="refetch"
         :disabled="isLoading"
         class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -29,14 +29,14 @@ const { result: posts, isLoading, error, refetch } = useApi.query.posts({
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
     </div>
 
-    <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+    <div v-else-if="errorMessage" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
       <p class="font-medium">Error loading posts</p>
-      <p class="text-sm mt-1">{{ error }}</p>
+      <p class="text-sm mt-1">{{ errorMessage }}</p>
     </div>
 
     <div v-else-if="posts && posts.length > 0" class="space-y-4">
-      <div 
-        v-for="post in posts.slice(0, 10)" 
+      <div
+        v-for="post in posts.slice(0, 10)"
         :key="post.id"
         class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
       >
