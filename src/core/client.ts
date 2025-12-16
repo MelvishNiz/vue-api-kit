@@ -187,7 +187,6 @@ export function createApiClient<
       const zodErrors = ref<Omit<$ZodIssue, "input">[] | undefined>();
       const isLoading = ref(false);
       const isDone = ref(false);
-      const uploadProgress = ref(0);
       const isFirstLoad = ref(true);
       let abortController = new AbortController();
 
@@ -202,7 +201,6 @@ export function createApiClient<
         }
         isLoading.value = true;
         errorMessage.value = undefined;
-        uploadProgress.value = 0;
 
         try {
           if (q.params && queryOptions?.params) {
@@ -224,16 +222,9 @@ export function createApiClient<
             signal: abortController.signal,
           };
 
-          // Only add data and upload progress for POST queries
+          // Only add data for POST queries
           if (q.method === "POST" && requestData) {
             requestConfig.data = requestData;
-            requestConfig.onUploadProgress = (progressEvent: any) => {
-              if (progressEvent.total) {
-                const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                uploadProgress.value = progress;
-                queryOptions?.onUploadProgress?.(progress);
-              }
-            };
           }
 
           const res = await client.request(requestConfig);
@@ -325,7 +316,7 @@ export function createApiClient<
         }
       }
 
-      return { result: data, errorMessage, zodErrors, isLoading, isDone, uploadProgress, refetch };
+      return { result: data, errorMessage, zodErrors, isLoading, isDone, refetch };
     };
   }
 

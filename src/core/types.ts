@@ -134,7 +134,6 @@ export interface UseQueryOptions<TParams = any, TData = any, TResult = any> {
   onResult?: (result: TResult) => void;
   onError?: (error: AxiosError | ZodError | Error) => void;
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
-  onUploadProgress?: (progress: number) => void;
 }
 
 /**
@@ -171,7 +170,6 @@ export interface QueryResult<TResult> {
   zodErrors: Ref<Omit<$ZodIssue, "input">[] | undefined>;
   isLoading: Ref<boolean>;
   isDone: Ref<boolean>;
-  uploadProgress: Ref<number>;
   refetch: () => Promise<void>;
 }
 
