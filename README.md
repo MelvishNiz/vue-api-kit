@@ -1,3 +1,25 @@
+<!-- Badges -->
+<p align="left">
+  <a href="https://www.npmjs.com/package/vue-api-kit">
+    <img src="https://img.shields.io/npm/v/vue-api-kit.svg?style=flat-square" alt="NPM Version" />
+  </a>
+  <a href="https://packagephobia.now.sh/result?p=vue-api-kit">
+    <img src="https://img.shields.io/badge/dynamic/json?url=https://packagephobia.com/v2/api.json?p=vue-api-kit&query=$.install.pretty&label=install%20size&style=flat-square" alt="Install Size" />
+  </a>
+  <a href="https://bundlephobia.com/result?p=vue-api-kit">
+    <img src="https://img.shields.io/bundlephobia/minzip/vue-api-kit?style=flat-square" alt="Bundle Size" />
+  </a>
+  <a href="https://npm-stat.com/charts.html?package=vue-api-kit">
+    <img src="https://img.shields.io/npm/dm/vue-api-kit.svg?style=flat-square" alt="NPM Downloads" />
+  </a>
+  <a href="https://github.com/MelvishNiz/vue-api-kit/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/MelvishNiz/vue-api-kit/release.yml?label=CI&logo=github&style=flat-square" alt="CI Status" />
+  </a>
+  <a href="https://github.com/MelvishNiz/vue-api-kit/blob/main/LICENSE">
+    <img src="https://img.shields.io/npm/l/vue-api-kit.svg?style=flat-square" alt="License" />
+  </a>
+</p>
+
 # 🚀 vue-api-kit
 
 A powerful and type-safe API client for Vue 3 applications with built-in validation using Zod.
@@ -166,7 +188,7 @@ const handleSearch = () => {
   <div>
     <input v-model="searchTerm" @keyup.enter="handleSearch" />
     <button @click="handleSearch" :disabled="isLoading">Search</button>
-    
+
     <div v-if="isLoading">Searching...</div>
     <div v-else-if="result">
       <div v-for="user in result" :key="user.id">
