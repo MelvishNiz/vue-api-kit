@@ -233,6 +233,7 @@ async function handleSubmit() {
 - ✅ **Lightweight**: ~7kB minified (2.2kB gzipped) - optimized for production
 - ✅ **Auto Loading States**: Built-in loading, error, and success states
 - ✅ **POST Queries**: Support for both GET and POST methods in queries for complex data retrieval
+- ✅ **Modular APIs**: Merge queries and mutations from separate files with full type safety
 - ✅ **File Upload**: Support for multipart/form-data in mutations
 - ✅ **Path Parameters**: Automatic path parameter replacement
 - ✅ **Debouncing**: Built-in request debouncing
@@ -283,6 +284,138 @@ const api = createApiClient({
   mutations: { /* ... */ }
 });
 ```
+
+## 🧩 Modular API Definitions
+
+For large applications, you can organize your API definitions into separate files and merge them together with full type safety.
+
+### Step 1: Define API modules in separate files
+
+**user-api.ts** - User-related queries and mutations
+```typescript
+import { z, defineQuery, defineMutation } from 'vue-api-kit';
+
+export const userQueries = {
+  getUsers: defineQuery({
+    method: 'GET',
+    path: '/users',
+    response: z.array(z.object({
+      id: z.number(),
+      name: z.string(),
+      email: z.string().email()
+    }))
+  }),
+  getUser: defineQuery({
+    method: 'GET',
+    path: '/users/{id}',
+    params: z.object({ id: z.number() }),
+    response: z.object({
+      id: z.number(),
+      name: z.string(),
+      email: z.string().email()
+    })
+  })
+};
+
+export const userMutations = {
+  createUser: defineMutation({
+    method: 'POST',
+    path: '/users',
+    data: z.object({
+      name: z.string(),
+      email: z.string().email()
+    }),
+    response: z.object({
+      id: z.number(),
+      name: z.string(),
+      email: z.string().email()
+    })
+  }),
+  updateUser: defineMutation({
+    method: 'PUT',
+    path: '/users/{id}',
+    params: z.object({ id: z.number() }),
+    data: z.object({
+      name: z.string().optional(),
+      email: z.string().email().optional()
+    }),
+    response: z.object({
+      id: z.number(),
+      name: z.string(),
+      email: z.string().email()
+    })
+  })
+};
+```
+
+**post-api.ts** - Post-related queries and mutations
+```typescript
+import { z, defineQuery, defineMutation } from 'vue-api-kit';
+
+export const postQueries = {
+  getPosts: defineQuery({
+    method: 'GET',
+    path: '/posts',
+    response: z.array(z.object({
+      id: z.number(),
+      title: z.string(),
+      body: z.string()
+    }))
+  })
+};
+
+export const postMutations = {
+  createPost: defineMutation({
+    method: 'POST',
+    path: '/posts',
+    data: z.object({
+      title: z.string(),
+      body: z.string()
+    }),
+    response: z.object({
+      id: z.number(),
+      title: z.string(),
+      body: z.string()
+    })
+  })
+};
+```
+
+### Step 2: Merge API definitions
+
+**api.ts** - Main API client with merged definitions
+```typescript
+import { createApiClient, mergeQueries, mergeMutations } from 'vue-api-kit';
+import { userQueries, userMutations } from './user-api';
+import { postQueries, postMutations } from './post-api';
+
+// Approach 1: Merge queries and mutations separately
+export const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  
+  // Merge all queries from different modules
+  queries: mergeQueries(userQueries, postQueries),
+  
+  // Merge all mutations from different modules
+  mutations: mergeMutations(userMutations, postMutations)
+});
+
+// Now you can use all queries and mutations with full type safety!
+// api.query.getUsers()    ✓ Fully typed
+// api.query.getPosts()    ✓ Fully typed
+// api.mutation.createUser ✓ Fully typed
+// api.mutation.createPost ✓ Fully typed
+```
+
+### Benefits of Modular Approach
+
+- **Separation of Concerns**: Keep related API endpoints together in dedicated files
+- **Reusability**: Import and reuse API definitions across multiple clients
+- **Team Collaboration**: Different team members can work on different API modules independently
+- **Full Type Safety**: TypeScript infers all types correctly, no loss of type information when merging
+- **No Manual Type Assertions**: Use `defineQuery()` and `defineMutation()` helpers instead of `as const`
+- **Easy Testing**: Test individual API modules in isolation
+- **Better Organization**: Manage large APIs without cluttering a single file
 
 ## 📤 File Upload Example
 
