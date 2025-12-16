@@ -1,3 +1,13 @@
+## [1.3.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.2.0...v1.3.0) (2025-12-16)
+
+### :sparkles: Features
+
+* optimize build size by externalizing dependencies and using tree-shakeable imports ([5e8356f](https://github.com/MelvishNiz/vue-api-kit/commit/5e8356f728cd5a3d8964e3e8a9848fc5e5e81e02))
+
+### :memo: Documentation
+
+* add production-ready features and sideEffects flag for better tree-shaking ([5fdc2c3](https://github.com/MelvishNiz/vue-api-kit/commit/5fdc2c37c945e381015497b16392d91b94150f42))
+
 ## [1.2.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.1.1...v1.2.0) (2025-12-16)
 
 ### :sparkles: Features
