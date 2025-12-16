@@ -1,3 +1,13 @@
+## [1.2.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.1.1...v1.2.0) (2025-12-16)
+
+### :sparkles: Features
+
+* add POST method support to queries with full type safety ([f340fc3](https://github.com/MelvishNiz/vue-api-kit/commit/f340fc3c259764ec945d82a623de311434491fda))
+
+### :zap: Refactor
+
+* improve type safety and optimize upload progress handling ([fad85f8](https://github.com/MelvishNiz/vue-api-kit/commit/fad85f8b06c40cbe03075b73b0f2229ee27de978))
+
 ## [1.1.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.1.0...v1.1.1) (2025-12-16)
 
 ### :zap: Refactor
