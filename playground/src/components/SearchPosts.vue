@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { useApi } from '../api-client';
 
-const searchQuery = ref('');
+const searchForm = reactive({
+  title: '',
+  body: '',
+  userId: 1,
+});
 
-// Example of POST query with data
+// Example of POST query with reactive data
 const { result, isLoading, errorMessage, refetch } = useApi.query.searchPosts({
-  data: {
-    title: searchQuery.value,
-  },
+  data: searchForm,
   loadOnMount: false,
   onResult: (data) => {
     console.log('Search result:', data);
@@ -28,9 +30,15 @@ const handleSearch = () => {
     <h2>POST Query Example - Search Posts</h2>
     <div class="search-form">
       <input 
-        v-model="searchQuery" 
+        v-model="searchForm.title" 
         type="text" 
         placeholder="Search by title..."
+        @keyup.enter="handleSearch"
+      />
+      <input 
+        v-model="searchForm.body" 
+        type="text" 
+        placeholder="Search by body..."
         @keyup.enter="handleSearch"
       />
       <button @click="handleSearch" :disabled="isLoading">
@@ -55,10 +63,10 @@ const handleSearch = () => {
     <div class="notes">
       <h4>Note about this demo:</h4>
       <p>
-        This demonstrates POST query support. The API endpoint (JSONPlaceholder) 
-        doesn't have a real search endpoint, so we're using /posts/1 as a demo.
-        In a real application, you would use a proper search endpoint that accepts 
-        POST data with search parameters.
+        This demonstrates POST query support with reactive form binding. 
+        The API endpoint (JSONPlaceholder) doesn't have a real search endpoint, 
+        so we're using /posts/1 as a demo. In a real application, you would use 
+        a proper search endpoint that accepts POST data with search parameters.
       </p>
       <p>
         <strong>Key Features:</strong>
@@ -67,7 +75,8 @@ const handleSearch = () => {
         <li>POST method in queries (not just mutations)</li>
         <li>Full type safety for data parameter</li>
         <li>Validation with Zod schemas</li>
-        <li>Reactive form binding</li>
+        <li>Reactive form binding with Vue's reactive()</li>
+        <li>Automatic re-execution when reactive data changes</li>
       </ul>
     </div>
   </div>

@@ -212,27 +212,33 @@ export function createApiClient<
           }
 
           // Prepare request data for POST queries
-          let requestData: any = queryOptions?.data;
+          let requestData = queryOptions?.data;
 
           // Validate data with Zod if schema is provided
           if (q.data && requestData) {
             (q.data as ZodType<any>).parse(requestData);
           }
 
-          const res = await client.request({
+          const requestConfig: any = {
             method: q.method ?? "GET",
             url: q.path,
             params: queryOptions?.params,
-            data: requestData,
             signal: abortController.signal,
-            onUploadProgress: (progressEvent) => {
+          };
+
+          // Only add data and upload progress for POST queries
+          if (q.method === "POST" && requestData) {
+            requestConfig.data = requestData;
+            requestConfig.onUploadProgress = (progressEvent: any) => {
               if (progressEvent.total) {
                 const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                 uploadProgress.value = progress;
                 queryOptions?.onUploadProgress?.(progress);
               }
-            },
-          });
+            };
+          }
+
+          const res = await client.request(requestConfig);
 
           const parsedData = q.response
             ? (q.response as ZodType<any>).parse(res.data)
