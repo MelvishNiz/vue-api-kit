@@ -1,11 +1,9 @@
 import axios, { AxiosError } from "axios";
 import { nextTick, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { ZodError, type ZodType } from "zod";
-import pkg from "lodash";
+import { debounce } from "lodash-es";
 import type { ApiClientOptions, ApiMutation, ApiQuery, Infer, MutationResult, QueryResult, UseMutationOptions, UseQueryOptions } from "./types";
 import type { $ZodIssue } from "zod/v4/core";
-
-const { debounce } = pkg;
 
 /* -------------------------------------------------------------------------- */
 /*                              CREATE API CLIENT                              */
