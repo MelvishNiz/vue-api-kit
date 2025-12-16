@@ -1,3 +1,21 @@
+## [1.4.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.4.0...v1.4.1) (2025-12-16)
+
+### :zap: Refactor
+
+* remove unused afterEach import in client tests ([ae019b0](https://github.com/MelvishNiz/vue-api-kit/commit/ae019b0bd40d6489f70e239e35ca52b482a08d7b))
+
+### :white_check_mark: Tests
+
+* add coverage reporting to CI workflow ([b194889](https://github.com/MelvishNiz/vue-api-kit/commit/b194889254652435bb1866c9f30bd1ee3a17f715))
+* add unit tests and CI workflow ([b904a71](https://github.com/MelvishNiz/vue-api-kit/commit/b904a71b01512a8b8043cc5843a31dd4f5b47c9f))
+* improve CI workflow and add coverage thresholds ([cb24983](https://github.com/MelvishNiz/vue-api-kit/commit/cb249839ea5b120de60d864b38e28431d8010064))
+
+### :repeat: CI
+
+* add test step before release ([4892515](https://github.com/MelvishNiz/vue-api-kit/commit/489251549ac81dd3383228af289fc0fb01b27d79))
+* remove push trigger from CI workflow ([158309d](https://github.com/MelvishNiz/vue-api-kit/commit/158309d21aff4bb2b0c4f9af771b825cadf2e31b))
+* use Bun instead of npm in CI workflow ([9f7500c](https://github.com/MelvishNiz/vue-api-kit/commit/9f7500c8b36b43ec7eb6ca74ab7fa3703fe8d20c))
+
 ## [1.4.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.3.0...v1.4.0) (2025-12-16)
 
 ### :sparkles: Features
