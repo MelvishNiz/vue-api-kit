@@ -58,6 +58,22 @@ export const useApi = createApiClient({
         email: z.string().email(),
         body: z.string(),
       })),
+    },
+    // Example POST query for searching
+    searchPosts: {
+      method: "POST",
+      path: "/posts/1", // Using this endpoint as a demo since JSONPlaceholder doesn't have a search endpoint
+      data: z.object({
+        title: z.string().optional(),
+        body: z.string().optional(),
+        userId: z.number().optional(),
+      }),
+      response: z.object({
+        userId: z.number(),
+        id: z.number(),
+        title: z.string(),
+        body: z.string(),
+      }),
     }
   },
   mutations: {

@@ -158,7 +158,7 @@ export function createApiClient<
   const queriesDef = options.queries ?? ({} as Q);
   const useQueries = {} as {
     [K in keyof Q]: (
-      options?: UseQueryOptions<Infer<Q[K]["params"]>, Infer<Q[K]["response"]>>
+      options?: UseQueryOptions<Infer<Q[K]["params"]>, Infer<Q[K]["data"]>, Infer<Q[K]["response"]>>
     ) => QueryResult<Infer<Q[K]["response"]>>;
   };
 
@@ -174,7 +174,8 @@ export function createApiClient<
         const hasOptionsProps = 'loadOnMount' in paramsOrOptions ||
                                 'debounce' in paramsOrOptions ||
                                 'onResult' in paramsOrOptions ||
-                                'onError' in paramsOrOptions;
+                                'onError' in paramsOrOptions ||
+                                'data' in paramsOrOptions;
         if (hasOptionsProps) {
           queryOptions = paramsOrOptions;
         } else {
@@ -188,6 +189,7 @@ export function createApiClient<
       const zodErrors = ref<Omit<$ZodIssue, "input">[] | undefined>();
       const isLoading = ref(false);
       const isDone = ref(false);
+      const uploadProgress = ref(0);
       const isFirstLoad = ref(true);
       let abortController = new AbortController();
 
@@ -202,18 +204,41 @@ export function createApiClient<
         }
         isLoading.value = true;
         errorMessage.value = undefined;
+        uploadProgress.value = 0;
 
         try {
           if (q.params && queryOptions?.params) {
             (q.params as ZodType<any>).parse(queryOptions.params);
           }
 
-          const res = await client.request({
+          // Prepare request data for POST queries
+          let requestData = queryOptions?.data;
+
+          // Validate data with Zod if schema is provided
+          if (q.data && requestData) {
+            (q.data as ZodType<any>).parse(requestData);
+          }
+
+          const requestConfig: any = {
             method: q.method ?? "GET",
             url: q.path,
             params: queryOptions?.params,
             signal: abortController.signal,
-          });
+          };
+
+          // Only add data and upload progress for POST queries
+          if (q.method === "POST" && requestData) {
+            requestConfig.data = requestData;
+            requestConfig.onUploadProgress = (progressEvent: any) => {
+              if (progressEvent.total) {
+                const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                uploadProgress.value = progress;
+                queryOptions?.onUploadProgress?.(progress);
+              }
+            };
+          }
+
+          const res = await client.request(requestConfig);
 
           const parsedData = q.response
             ? (q.response as ZodType<any>).parse(res.data)
@@ -276,11 +301,11 @@ export function createApiClient<
 
       let stopWatcher: (() => void) | null = null;
 
-      if (queryOptions?.params) {
+      if (queryOptions?.params || queryOptions?.data) {
         onMounted(() => {
           if (stopWatcher) stopWatcher();
           stopWatcher = watch(
-            () => JSON.stringify(queryOptions.params),
+            () => JSON.stringify({ params: queryOptions.params, data: queryOptions.data }),
             () => {
               debouncedRefetch();
             },
@@ -302,7 +327,7 @@ export function createApiClient<
         }
       }
 
-      return { result: data, errorMessage, zodErrors, isLoading, isDone, refetch };
+      return { result: data, errorMessage, zodErrors, isLoading, isDone, uploadProgress, refetch };
     };
   }
 

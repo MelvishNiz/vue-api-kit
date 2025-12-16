@@ -34,6 +34,23 @@ const api = createApiClient({
         name: z.string(),
         email: z.string()
       })
+    },
+    // POST query for complex searches
+    searchUsers: {
+      method: 'POST',
+      path: '/users/search',
+      data: z.object({
+        query: z.string(),
+        filters: z.object({
+          active: z.boolean().optional(),
+          role: z.string().optional()
+        }).optional()
+      }),
+      response: z.array(z.object({
+        id: z.number(),
+        name: z.string(),
+        email: z.string()
+      }))
     }
   },
   mutations: {
@@ -70,7 +87,11 @@ const api = createApiClient({
 
 ## 📖 Usage in Vue Components
 
-### Queries (GET requests)
+### Queries (GET and POST requests)
+
+Queries support both GET and POST methods, allowing you to fetch data with complex search criteria.
+
+#### GET Queries
 
 ```vue
 <script setup lang="ts">
@@ -107,6 +128,51 @@ const { result: data } = api.query.getUsers({
         {{ user.name }}
       </li>
     </ul>
+  </div>
+</template>
+```
+
+#### POST Queries
+
+POST queries are perfect for complex searches, filtering, or any operation that requires sending data in the request body.
+
+```vue
+<script setup lang="ts">
+import { api } from './api';
+import { ref } from 'vue';
+
+const searchTerm = ref('');
+
+const { result, isLoading, refetch } = api.query.searchUsers({
+  data: {
+    query: searchTerm.value,
+    filters: {
+      active: true,
+      role: 'admin'
+    }
+  },
+  loadOnMount: false,
+  onResult: (data) => {
+    console.log('Search results:', data);
+  }
+});
+
+const handleSearch = () => {
+  refetch();
+};
+</script>
+
+<template>
+  <div>
+    <input v-model="searchTerm" @keyup.enter="handleSearch" />
+    <button @click="handleSearch" :disabled="isLoading">Search</button>
+    
+    <div v-if="isLoading">Searching...</div>
+    <div v-else-if="result">
+      <div v-for="user in result" :key="user.id">
+        {{ user.name }}
+      </div>
+    </div>
   </div>
 </template>
 ```
@@ -156,11 +222,13 @@ async function handleSubmit() {
 - ✅ **Zod Validation**: Built-in request/response validation
 - ✅ **Vue 3 Composition API**: Reactive state management
 - ✅ **Auto Loading States**: Built-in loading, error, and success states
-- ✅ **File Upload**: Support for multipart/form-data
+- ✅ **POST Queries**: Support for both GET and POST methods in queries for complex data retrieval
+- ✅ **File Upload**: Support for multipart/form-data in mutations
 - ✅ **Path Parameters**: Automatic path parameter replacement
 - ✅ **Debouncing**: Built-in request debouncing
 - ✅ **Global Error Handling**: Centralized error management
 - ✅ **Request Interceptors**: Modify requests before sending
+- ✅ **Fully Typed**: Complete type inference for params, data, and response
 
 ## 🔧 Advanced Configuration
 
@@ -207,6 +275,8 @@ const api = createApiClient({
 
 ## 📤 File Upload Example
 
+File uploads are supported in mutations using the `isMultipart` flag.
+
 ```typescript
 const api = createApiClient({
   baseURL: 'https://api.example.com',
@@ -230,7 +300,7 @@ const { mutate, uploadProgress } = api.mutation.uploadImage({
 });
 
 async function handleUpload(file: File) {
-  await mutate({ file });
+  await mutate({ data: { file } });
 }
 ```
 

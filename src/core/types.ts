@@ -20,8 +20,9 @@ export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export type Infer<T> = T extends ZodType<infer U> ? U : any;
 
 /**
- * Defines a query (GET request) endpoint configuration
- * @template TParams - Zod schema for query parameters
+ * Defines a query endpoint configuration (supports GET and POST methods)
+ * @template TParams - Zod schema for query/path parameters
+ * @template TData - Zod schema for request body (POST only)
  * @template TResponse - Zod schema for response data
  * @example
  * const getUsers: ApiQuery = {
@@ -30,14 +31,23 @@ export type Infer<T> = T extends ZodType<infer U> ? U : any;
  *   params: z.object({ page: z.number() }),
  *   response: z.array(z.object({ id: z.number(), name: z.string() }))
  * };
+ * @example
+ * const searchUsers: ApiQuery = {
+ *   method: "POST",
+ *   path: "/users/search",
+ *   data: z.object({ query: z.string() }),
+ *   response: z.array(z.object({ id: z.number(), name: z.string() }))
+ * };
  */
 export interface ApiQuery<
   TParams extends ZodType<any> | undefined = ZodType<any> | undefined,
+  TData extends ZodType<any> | undefined = ZodType<any> | undefined,
   TResponse extends ZodType<any> | undefined = ZodType<any> | undefined
 > {
-  method?: Extract<HTTPMethod, "GET">;
+  method?: Extract<HTTPMethod, "GET" | "POST">;
   path: string;
   params?: TParams;
+  data?: TData;
   response?: TResponse;
 }
 
@@ -99,6 +109,7 @@ export interface ApiClientOptions<
 /**
  * Options for configuring a query hook
  * @template TParams - Type of query parameters
+ * @template TData - Type of request body data (for POST queries)
  * @template TResult - Type of result data
  * @example
  * const options: UseQueryOptions = {
@@ -108,14 +119,22 @@ export interface ApiClientOptions<
  *   onResult: (data) => console.log(data),
  *   onError: (error) => console.error(error)
  * };
+ * @example
+ * const options: UseQueryOptions = {
+ *   data: { query: "search term" },
+ *   loadOnMount: true,
+ *   onResult: (data) => console.log(data)
+ * };
  */
-export interface UseQueryOptions<TParams = any, TResult = any> {
+export interface UseQueryOptions<TParams = any, TData = any, TResult = any> {
   params?: TParams;
+  data?: TData;
   loadOnMount?: boolean;
   debounce?: number;
   onResult?: (result: TResult) => void;
   onError?: (error: AxiosError | ZodError | Error) => void;
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
+  onUploadProgress?: (progress: number) => void;
 }
 
 /**
@@ -144,6 +163,7 @@ export interface UseMutationOptions<TResult = any> {
  * // isLoading.value indicates loading state
  * // errorMessage.value contains any error message
  * // refetch() to manually trigger a new request
+ * // uploadProgress.value shows upload progress (0-100) for POST queries with file uploads
  */
 export interface QueryResult<TResult> {
   result: Ref<TResult | undefined>;
@@ -151,6 +171,7 @@ export interface QueryResult<TResult> {
   zodErrors: Ref<Omit<$ZodIssue, "input">[] | undefined>;
   isLoading: Ref<boolean>;
   isDone: Ref<boolean>;
+  uploadProgress: Ref<number>;
   refetch: () => Promise<void>;
 }
 
