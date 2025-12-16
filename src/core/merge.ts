@@ -52,7 +52,7 @@ export function mergeMutations<
  * Merges multiple partial API client options into a single complete configuration
  * This is useful when you want to combine API definitions from different modules
  * @template T - Array of partial API client options
- * @param options - Array of partial API options to merge (baseURL from first option is used)
+ * @param options - Array of partial API options to merge (first non-empty baseURL is used)
  * @returns Merged API client options with combined queries and mutations
  * @example
  * const userApi = {
@@ -75,7 +75,7 @@ export function mergeMutations<
 export function mergeApiDefinitions<
   T extends Array<Partial<ApiClientOptions>>
 >(...options: T): MergeApiOptions<T> {
-  const merged: any = {
+  const merged: Partial<ApiClientOptions> = {
     baseURL: '',
     queries: {},
     mutations: {},
