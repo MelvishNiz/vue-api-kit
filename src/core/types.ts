@@ -99,9 +99,9 @@ export interface ApiClientOptions<
   withCredentials?: boolean;
   queries?: Q;
   mutations?: M;
-  onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | any;
-  onStartRequest?: () => Promise<void>;
-  onFinishRequest?: () => Promise<void>;
+  onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
+  onStartRequest?: () => Promise<void> | void | any;
+  onFinishRequest?: () => Promise<void> | void | any;
   onErrorRequest?: (error: { message: string; status?: number; code?: string, data?: any }) => void;
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
 }
