@@ -166,12 +166,12 @@ export interface QueryResult<TResult> {
  * // isLoading.value indicates loading state
  * // uploadProgress.value shows upload progress (0-100)
  */
-export interface MutationResult<TResult, TData> {
+export interface MutationResult<TResult, TData = any, TParams = any> {
   result: Ref<TResult | undefined>;
   errorMessage: Ref<string | undefined>;
   zodErrors: Ref<Omit<$ZodIssue, "input">[] | undefined>;
   isLoading: Ref<boolean>;
   isDone: Ref<boolean>;
   uploadProgress: Ref<number>;
-  mutate: (data: TData & { params?: any }) => Promise<void>;
+  mutate: ({data, params}: {data?: TData; params?: TParams}) => Promise<void>;
 }

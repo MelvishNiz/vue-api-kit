@@ -52,7 +52,9 @@ const handleSubmit = async () => {
     return;
   }
   mutate({
-    file: selectedFile.value,
+    data: {
+      file: selectedFile.value
+    }
   });
 };
 

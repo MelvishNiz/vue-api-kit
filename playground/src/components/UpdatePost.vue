@@ -23,9 +23,11 @@ const handleSubmit = () => {
 
   mutate({
     params: { id: postId.value },
-    title: title.value,
-    body: body.value,
-    userId: userId.value,
+    data: {
+      title: title.value,
+      body: body.value,
+      userId: userId.value,
+    }
   });
 };
 </script>

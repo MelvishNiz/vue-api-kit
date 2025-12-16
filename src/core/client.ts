@@ -313,7 +313,7 @@ export function createApiClient<
   const useMutations = {} as {
     [K in keyof M]: (
       options?: UseMutationOptions<Infer<M[K]["response"]>>
-    ) => MutationResult<Infer<M[K]["response"]>, Infer<M[K]["data"]>>;
+    ) => MutationResult<Infer<M[K]["response"]>, Infer<M[K]["data"]>, Infer<M[K]["params"]>>;
   };
 
   for (const key in mutationsDef) {
@@ -328,7 +328,7 @@ export function createApiClient<
       const isDone = ref(false);
       const uploadProgress = ref(0);
 
-      const mutate = async (mutationData: any) => {
+      const mutate = async (props: {data?: any, params?: any}) => {
         if (isLoading.value) return;
         isLoading.value = true;
         errorMessage.value = undefined;
@@ -336,10 +336,10 @@ export function createApiClient<
 
         try {
           // Extract params if exists
-          const { params, ...dataWithoutParams } = mutationData || {};
+          const {data: dataWithoutParams, params} = props;
 
           // Prepare request data
-          let requestData: any = dataWithoutParams;
+          let requestData: any = dataWithoutParams ?? {};
           let headers: Record<string, string> = {};
 
           // Handle multipart/form-data for file uploads

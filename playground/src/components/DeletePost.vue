@@ -17,7 +17,9 @@ const { result, isLoading, errorMessage, mutate } = useApi.mutation.deletePost({
 
 const handleDelete = () => {
   mutate({
-    params: { id: postId.value }
+    params: {
+      id: postId.value
+    }
   });
 };
 </script>
