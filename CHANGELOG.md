@@ -1,3 +1,9 @@
+## [1.4.2](https://github.com/MelvishNiz/vue-api-kit/compare/v1.4.1...v1.4.2) (2025-12-16)
+
+### :bug: Fixes
+
+* **types:** allow void return type for request lifecycle hooks ([c366242](https://github.com/MelvishNiz/vue-api-kit/commit/c3662424d20ea81f607252c0ed0ef17cb53860f3))
+
 ## [1.4.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.4.0...v1.4.1) (2025-12-16)
 
 ### :zap: Refactor
