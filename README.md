@@ -1,26 +1,13 @@
-<!-- Badges -->
-<p align="left">
-  <a href="https://www.npmjs.com/package/vue-api-kit">
-    <img src="https://img.shields.io/npm/v/vue-api-kit.svg?style=flat-square" alt="NPM Version" />
-  </a>
-  <a href="https://packagephobia.now.sh/result?p=vue-api-kit">
-    <img src="https://img.shields.io/badge/dynamic/json?url=https://packagephobia.com/v2/api.json?p=vue-api-kit&query=$.install.pretty&label=install%20size&style=flat-square" alt="Install Size" />
-  </a>
-  <a href="https://bundlephobia.com/result?p=vue-api-kit">
-    <img src="https://img.shields.io/bundlephobia/minzip/vue-api-kit?style=flat-square" alt="Bundle Size" />
-  </a>
-  <a href="https://npm-stat.com/charts.html?package=vue-api-kit">
-    <img src="https://img.shields.io/npm/dm/vue-api-kit.svg?style=flat-square" alt="NPM Downloads" />
-  </a>
-  <a href="https://github.com/MelvishNiz/vue-api-kit/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/MelvishNiz/vue-api-kit/release.yml?label=CI&logo=github&style=flat-square" alt="CI Status" />
-  </a>
-  <a href="https://github.com/MelvishNiz/vue-api-kit/blob/main/LICENSE">
-    <img src="https://img.shields.io/npm/l/vue-api-kit.svg?style=flat-square" alt="License" />
-  </a>
-</p>
+
 
 # 🚀 vue-api-kit
+
+[![NPM Version](https://img.shields.io/npm/v/vue-api-kit.svg?style=flat-square)](https://www.npmjs.com/package/vue-api-kit)
+[![Install Size](https://img.shields.io/badge/dynamic/json?url=https://packagephobia.com/v2/api.json?p=vue-api-kit&query=$.install.pretty&label=install%20size&style=flat-square)](https://packagephobia.now.sh/result?p=vue-api-kit)
+[![Bundle Size](https://img.shields.io/bundlephobia/minzip/vue-api-kit?style=flat-square)](https://bundlephobia.com/result?p=vue-api-kit)
+[![NPM Downloads](https://img.shields.io/npm/dm/vue-api-kit.svg?style=flat-square)](https://npm-stat.com/charts.html?package=vue-api-kit)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/MelvishNiz/vue-api-kit/release.yml?label=CI&logo=github&style=flat-square)](https://github.com/MelvishNiz/vue-api-kit/actions)
+[![License](https://img.shields.io/npm/l/vue-api-kit.svg?style=flat-square)](https://github.com/MelvishNiz/vue-api-kit/blob/main/LICENSE)
 
 A powerful and type-safe API client for Vue 3 applications with built-in validation using Zod.
 
