@@ -3,7 +3,7 @@
  * This file demonstrates how to define post-related queries and mutations in a separate module
  */
 
-import { z } from '../../../dist';
+import { z, defineQuery, defineMutation } from '../../../dist';
 
 // Post schemas
 export const PostSchema = z.object({
@@ -27,36 +27,36 @@ export const CommentListSchema = z.array(CommentSchema);
 
 // Define post queries separately
 export const postQueries = {
-  getPosts: {
-    method: 'GET' as const,
+  getPosts: defineQuery({
+    method: 'GET',
     path: '/posts',
     params: z.object({
       userId: z.number().optional(),
     }).optional(),
     response: PostListSchema,
-  },
+  }),
   
-  getPost: {
-    method: 'GET' as const,
+  getPost: defineQuery({
+    method: 'GET',
     path: '/posts/{id}',
     params: z.object({
       id: z.number(),
     }),
     response: PostSchema,
-  },
+  }),
   
-  getPostComments: {
-    method: 'GET' as const,
+  getPostComments: defineQuery({
+    method: 'GET',
     path: '/posts/{postId}/comments',
     params: z.object({
       postId: z.number(),
     }),
     response: CommentListSchema,
-  },
+  }),
   
   // POST query for searching posts
-  searchPosts: {
-    method: 'POST' as const,
+  searchPosts: defineQuery({
+    method: 'POST',
     path: '/posts/1', // Demo endpoint
     data: z.object({
       title: z.string().optional(),
@@ -64,13 +64,13 @@ export const postQueries = {
       userId: z.number().optional(),
     }),
     response: PostSchema,
-  },
+  }),
 };
 
 // Define post mutations separately
 export const postMutations = {
-  createPost: {
-    method: 'POST' as const,
+  createPost: defineMutation({
+    method: 'POST',
     path: '/posts',
     data: z.object({
       title: z.string(),
@@ -78,10 +78,10 @@ export const postMutations = {
       userId: z.number(),
     }),
     response: PostSchema,
-  },
+  }),
   
-  updatePost: {
-    method: 'PUT' as const,
+  updatePost: defineMutation({
+    method: 'PUT',
     path: '/posts/{id}',
     params: z.object({
       id: z.number(),
@@ -92,16 +92,16 @@ export const postMutations = {
       userId: z.number(),
     }),
     response: PostSchema,
-  },
+  }),
   
-  deletePost: {
-    method: 'DELETE' as const,
+  deletePost: defineMutation({
+    method: 'DELETE',
     path: '/posts/{id}',
     params: z.object({
       id: z.number(),
     }),
     response: z.object({}),
-  },
+  }),
 };
 
 // Export types for use in components

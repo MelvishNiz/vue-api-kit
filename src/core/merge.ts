@@ -1,5 +1,52 @@
 import type { ApiQuery, ApiMutation } from "./types";
 
+/* -------------------------------------------------------------------------- */
+/*                           DEFINE HELPERS                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Helper function to define a query with proper type inference
+ * Eliminates the need for 'as const' assertions
+ * @template T - Query definition type
+ * @param query - Query definition object
+ * @returns The same query with proper type inference
+ * @example
+ * export const userQueries = {
+ *   getUsers: defineQuery({
+ *     method: 'GET',
+ *     path: '/users',
+ *     response: z.array(UserSchema)
+ *   })
+ * };
+ */
+export function defineQuery<T extends ApiQuery>(query: T): T {
+  return query;
+}
+
+/**
+ * Helper function to define a mutation with proper type inference
+ * Eliminates the need for 'as const' assertions
+ * @template T - Mutation definition type
+ * @param mutation - Mutation definition object
+ * @returns The same mutation with proper type inference
+ * @example
+ * export const userMutations = {
+ *   createUser: defineMutation({
+ *     method: 'POST',
+ *     path: '/users',
+ *     data: CreateUserSchema,
+ *     response: UserSchema
+ *   })
+ * };
+ */
+export function defineMutation<T extends ApiMutation>(mutation: T): T {
+  return mutation;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                           MERGE UTILITIES                                  */
+/* -------------------------------------------------------------------------- */
+
 /**
  * Merges multiple query definitions into a single queries object with full type safety
  * @template T - Array of query definition objects

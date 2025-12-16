@@ -3,7 +3,7 @@
  * This file demonstrates how to define user-related queries and mutations in a separate module
  */
 
-import { z } from '../../../dist';
+import { z, defineQuery, defineMutation } from '../../../dist';
 
 // User schemas
 export const UserSchema = z.object({
@@ -18,41 +18,41 @@ export const UserListSchema = z.array(UserSchema);
 
 // Define user queries separately
 export const userQueries = {
-  getUsers: {
-    method: 'GET' as const,
+  getUsers: defineQuery({
+    method: 'GET',
     path: '/users',
     params: z.object({
       page: z.number().optional(),
       limit: z.number().optional(),
     }).optional(),
     response: UserListSchema,
-  },
+  }),
 
-  getUser: {
-    method: 'GET' as const,
+  getUser: defineQuery({
+    method: 'GET',
     path: '/users/{id}',
     params: z.object({
       id: z.number(),
     }),
     response: UserSchema,
-  },
+  }),
 
   // POST query for searching users
-  searchUsers: {
-    method: 'POST' as const,
+  searchUsers: defineQuery({
+    method: 'POST',
     path: '/users/1', // Demo endpoint
     data: z.object({
       query: z.string().optional(),
       email: z.string().email().optional(),
     }),
     response: UserSchema,
-  },
+  }),
 };
 
 // Define user mutations separately
 export const userMutations = {
-  createUser: {
-    method: 'POST' as const,
+  createUser: defineMutation({
+    method: 'POST',
     path: '/users',
     data: z.object({
       name: z.string(),
@@ -60,10 +60,10 @@ export const userMutations = {
       email: z.string().email(),
     }),
     response: UserSchema,
-  },
+  }),
 
-  updateUser: {
-    method: 'PUT' as const,
+  updateUser: defineMutation({
+    method: 'PUT',
     path: '/users/{id}',
     params: z.object({
       id: z.number(),
@@ -73,16 +73,16 @@ export const userMutations = {
       email: z.string().email().optional(),
     }),
     response: UserSchema,
-  },
+  }),
 
-  deleteUser: {
-    method: 'DELETE' as const,
+  deleteUser: defineMutation({
+    method: 'DELETE',
     path: '/users/{id}',
     params: z.object({
       id: z.number(),
     }),
     response: z.object({}),
-  },
+  }),
 };
 
 // Export types for use in components

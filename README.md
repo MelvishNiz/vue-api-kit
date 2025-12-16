@@ -293,20 +293,20 @@ For large applications, you can organize your API definitions into separate file
 
 **user-api.ts** - User-related queries and mutations
 ```typescript
-import { z } from 'vue-api-kit';
+import { z, defineQuery, defineMutation } from 'vue-api-kit';
 
 export const userQueries = {
-  getUsers: {
-    method: 'GET' as const,
+  getUsers: defineQuery({
+    method: 'GET',
     path: '/users',
     response: z.array(z.object({
       id: z.number(),
       name: z.string(),
       email: z.string().email()
     }))
-  },
-  getUser: {
-    method: 'GET' as const,
+  }),
+  getUser: defineQuery({
+    method: 'GET',
     path: '/users/{id}',
     params: z.object({ id: z.number() }),
     response: z.object({
@@ -314,12 +314,12 @@ export const userQueries = {
       name: z.string(),
       email: z.string().email()
     })
-  }
+  })
 };
 
 export const userMutations = {
-  createUser: {
-    method: 'POST' as const,
+  createUser: defineMutation({
+    method: 'POST',
     path: '/users',
     data: z.object({
       name: z.string(),
@@ -330,9 +330,9 @@ export const userMutations = {
       name: z.string(),
       email: z.string().email()
     })
-  },
-  updateUser: {
-    method: 'PUT' as const,
+  }),
+  updateUser: defineMutation({
+    method: 'PUT',
     path: '/users/{id}',
     params: z.object({ id: z.number() }),
     data: z.object({
@@ -344,29 +344,29 @@ export const userMutations = {
       name: z.string(),
       email: z.string().email()
     })
-  }
+  })
 };
 ```
 
 **post-api.ts** - Post-related queries and mutations
 ```typescript
-import { z } from 'vue-api-kit';
+import { z, defineQuery, defineMutation } from 'vue-api-kit';
 
 export const postQueries = {
-  getPosts: {
-    method: 'GET' as const,
+  getPosts: defineQuery({
+    method: 'GET',
     path: '/posts',
     response: z.array(z.object({
       id: z.number(),
       title: z.string(),
       body: z.string()
     }))
-  }
+  })
 };
 
 export const postMutations = {
-  createPost: {
-    method: 'POST' as const,
+  createPost: defineMutation({
+    method: 'POST',
     path: '/posts',
     data: z.object({
       title: z.string(),
@@ -377,7 +377,7 @@ export const postMutations = {
       title: z.string(),
       body: z.string()
     })
-  }
+  })
 };
 ```
 
@@ -407,44 +407,13 @@ export const api = createApiClient({
 // api.mutation.createPost ✓ Fully typed
 ```
 
-Alternatively, use `mergeApiDefinitions` to merge complete API configurations:
-
-```typescript
-import { createApiClient, mergeApiDefinitions } from 'vue-api-kit';
-import { userQueries, userMutations } from './user-api';
-import { postQueries, postMutations } from './post-api';
-
-const baseConfig = {
-  baseURL: 'https://api.example.com',
-  headers: { 'Content-Type': 'application/json' }
-};
-
-const userApiConfig = {
-  queries: userQueries,
-  mutations: userMutations
-};
-
-const postApiConfig = {
-  queries: postQueries,
-  mutations: postMutations
-};
-
-// Merge all configurations
-const mergedConfig = mergeApiDefinitions(
-  baseConfig,
-  userApiConfig,
-  postApiConfig
-);
-
-export const api = createApiClient(mergedConfig);
-```
-
 ### Benefits of Modular Approach
 
 - **Separation of Concerns**: Keep related API endpoints together in dedicated files
 - **Reusability**: Import and reuse API definitions across multiple clients
 - **Team Collaboration**: Different team members can work on different API modules independently
 - **Full Type Safety**: TypeScript infers all types correctly, no loss of type information when merging
+- **No Manual Type Assertions**: Use `defineQuery()` and `defineMutation()` helpers instead of `as const`
 - **Easy Testing**: Test individual API modules in isolation
 - **Better Organization**: Manage large APIs without cluttering a single file
 

@@ -34,24 +34,24 @@ Create separate files for each domain/entity:
 
 **user-api.ts**
 ```typescript
-import { z } from 'vue-api-kit';
+import { z, defineQuery, defineMutation } from 'vue-api-kit';
 
 export const userQueries = {
-  getUsers: {
-    method: 'GET' as const,
+  getUsers: defineQuery({
+    method: 'GET',
     path: '/users',
     response: z.array(z.object({ id: z.number(), name: z.string() }))
-  }
-} as const;
+  })
+};
 
 export const userMutations = {
-  createUser: {
-    method: 'POST' as const,
+  createUser: defineMutation({
+    method: 'POST',
     path: '/users',
     data: z.object({ name: z.string() }),
     response: z.object({ id: z.number(), name: z.string() })
-  }
-} as const;
+  })
+};
 ```
 
 ### 2. Merge API Definitions
@@ -107,20 +107,6 @@ const queries = process.env.VITE_ENABLE_COMMENTS === 'true'
   : baseQueries;
 ```
 
-### Using mergeApiDefinitions
-
-For more complex scenarios, merge complete API configurations:
-
-```typescript
-const config = mergeApiDefinitions(
-  { baseURL: 'https://api.example.com' },
-  { queries: userQueries, mutations: userMutations },
-  { queries: postQueries, mutations: postMutations }
-);
-
-export const api = createApiClient(config);
-```
-
 ## Type Safety Guarantees
 
 The merge utilities preserve all type information:
@@ -159,7 +145,7 @@ describe('User API', () => {
 
 ## Best Practices
 
-1. **Use `as const` assertions** - Ensures literal types are preserved
+1. **Use `defineQuery()` and `defineMutation()` helpers** - Ensures proper type inference without manual `as const` assertions
 2. **Group related endpoints** - Keep user, post, auth, etc. in separate files
 3. **Export schemas** - Share Zod schemas between frontend and backend
 4. **Document your APIs** - Add JSDoc comments to API definitions
