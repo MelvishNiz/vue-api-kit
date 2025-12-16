@@ -221,6 +221,7 @@ async function handleSubmit() {
 - ✅ **Type-Safe**: Full TypeScript support with automatic type inference
 - ✅ **Zod Validation**: Built-in request/response validation
 - ✅ **Vue 3 Composition API**: Reactive state management
+- ✅ **Lightweight**: ~7kB minified (2.2kB gzipped) - optimized for production
 - ✅ **Auto Loading States**: Built-in loading, error, and success states
 - ✅ **POST Queries**: Support for both GET and POST methods in queries for complex data retrieval
 - ✅ **File Upload**: Support for multipart/form-data in mutations
@@ -229,6 +230,7 @@ async function handleSubmit() {
 - ✅ **Global Error Handling**: Centralized error management
 - ✅ **Request Interceptors**: Modify requests before sending
 - ✅ **Fully Typed**: Complete type inference for params, data, and response
+- ✅ **Tree-Shakeable**: Only bundles what you use
 
 ## 🔧 Advanced Configuration
 
