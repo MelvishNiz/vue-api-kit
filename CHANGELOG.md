@@ -1,3 +1,26 @@
+## [1.4.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.3.0...v1.4.0) (2025-12-16)
+
+### :sparkles: Features
+
+* add defineQuery and defineMutation helpers for better type inference ([0b845bc](https://github.com/MelvishNiz/vue-api-kit/commit/0b845bc6c30e7247083d7e1f67636c3461015db7))
+* add modular API merge utilities with full type safety ([ebb7b94](https://github.com/MelvishNiz/vue-api-kit/commit/ebb7b94ca5d7840958c1ddb5922e24b52fac09d7))
+* integrate product queries and mutations into the API client example ([26e8cc8](https://github.com/MelvishNiz/vue-api-kit/commit/26e8cc8d06d1d2df908ae23922179dbca6a1ce9a))
+
+### :bug: Fixes
+
+* improve type safety in mergeApiDefinitions implementation ([e70d184](https://github.com/MelvishNiz/vue-api-kit/commit/e70d18483176295c3e72654da7248ddb55fdd8c4))
+
+### :memo: Documentation
+
+* add badges for version, install size, bundle size, downloads, CI status, and license to README ([76f7a2d](https://github.com/MelvishNiz/vue-api-kit/commit/76f7a2da652b7cd19fdef8c07ea168e3b997849c))
+* add comprehensive examples and guide for modular API feature ([5a55482](https://github.com/MelvishNiz/vue-api-kit/commit/5a554822baaee0f2b577698dbbce0f76173d6fed))
+* add example comparing old vs new API with defineQuery/defineMutation ([ef27793](https://github.com/MelvishNiz/vue-api-kit/commit/ef277938d341ed4d17dc0f274cd52f9384514877))
+
+### :zap: Refactor
+
+* remove unused mergeApiDefinitions function and related code ([15fb593](https://github.com/MelvishNiz/vue-api-kit/commit/15fb593c4870d4b3243071ca2d702e9e5ac6ed79))
+* remove upload progress handling from createApiClient and related types ([c88776e](https://github.com/MelvishNiz/vue-api-kit/commit/c88776e068647a0fa7487013d8fdd70cef62e8df))
+
 ## [1.3.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.2.0...v1.3.0) (2025-12-16)
 
 ### :sparkles: Features
