@@ -1,4 +1,4 @@
-import type { ApiQuery, ApiMutation, ApiClientOptions } from "./types";
+import type { ApiQuery, ApiMutation } from "./types";
 
 /**
  * Merges multiple query definitions into a single queries object with full type safety
@@ -10,11 +10,11 @@ import type { ApiQuery, ApiMutation, ApiClientOptions } from "./types";
  *   getUsers: { path: '/users', response: z.array(UserSchema) },
  *   getUser: { path: '/users/{id}', params: z.object({ id: z.number() }), response: UserSchema }
  * };
- * 
+ *
  * const postQueries = {
  *   getPosts: { path: '/posts', response: z.array(PostSchema) }
  * };
- * 
+ *
  * const allQueries = mergeQueries(userQueries, postQueries);
  * // Result: { getUsers, getUser, getPosts } with full type inference
  */
@@ -34,11 +34,11 @@ export function mergeQueries<
  *   createUser: { method: 'POST', path: '/users', data: CreateUserSchema, response: UserSchema },
  *   updateUser: { method: 'PUT', path: '/users/{id}', params: z.object({ id: z.number() }), data: UpdateUserSchema, response: UserSchema }
  * };
- * 
+ *
  * const postMutations = {
  *   createPost: { method: 'POST', path: '/posts', data: CreatePostSchema, response: PostSchema }
  * };
- * 
+ *
  * const allMutations = mergeMutations(userMutations, postMutations);
  * // Result: { createUser, updateUser, createPost } with full type inference
  */
@@ -46,85 +46,6 @@ export function mergeMutations<
   T extends Array<Record<string, ApiMutation>>
 >(...mutationDefinitions: T): UnionToIntersection<T[number]> {
   return Object.assign({}, ...mutationDefinitions) as UnionToIntersection<T[number]>;
-}
-
-/**
- * Merges multiple partial API client options into a single complete configuration
- * This is useful when you want to combine API definitions from different modules
- * @template T - Array of partial API client options
- * @param options - Array of partial API options to merge (first non-empty baseURL is used)
- * @returns Merged API client options with combined queries and mutations
- * @example
- * const userApi = {
- *   queries: { getUsers: {...}, getUser: {...} },
- *   mutations: { createUser: {...}, updateUser: {...} }
- * };
- * 
- * const postApi = {
- *   queries: { getPosts: {...}, getPost: {...} },
- *   mutations: { createPost: {...}, updatePost: {...} }
- * };
- * 
- * const completeApi = mergeApiDefinitions(
- *   { baseURL: 'https://api.example.com' },
- *   userApi,
- *   postApi
- * );
- * // Result: Full API config with all queries and mutations merged
- */
-export function mergeApiDefinitions<
-  T extends Array<Partial<ApiClientOptions>>
->(...options: T): MergeApiOptions<T> {
-  const merged: Partial<ApiClientOptions> = {
-    baseURL: '',
-    queries: {},
-    mutations: {},
-  };
-
-  for (const option of options) {
-    if (option.baseURL && !merged.baseURL) {
-      merged.baseURL = option.baseURL;
-    }
-    
-    if (option.headers) {
-      merged.headers = { ...merged.headers, ...option.headers };
-    }
-    
-    if (option.withCredentials !== undefined) {
-      merged.withCredentials = option.withCredentials;
-    }
-    
-    if (option.queries) {
-      merged.queries = { ...merged.queries, ...option.queries };
-    }
-    
-    if (option.mutations) {
-      merged.mutations = { ...merged.mutations, ...option.mutations };
-    }
-    
-    // Merge callbacks - last one wins for each callback
-    if (option.onBeforeRequest) {
-      merged.onBeforeRequest = option.onBeforeRequest;
-    }
-    
-    if (option.onStartRequest) {
-      merged.onStartRequest = option.onStartRequest;
-    }
-    
-    if (option.onFinishRequest) {
-      merged.onFinishRequest = option.onFinishRequest;
-    }
-    
-    if (option.onErrorRequest) {
-      merged.onErrorRequest = option.onErrorRequest;
-    }
-    
-    if (option.onZodError) {
-      merged.onZodError = option.onZodError;
-    }
-  }
-
-  return merged as MergeApiOptions<T>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -141,18 +62,3 @@ type UnionToIntersection<U> = (
   ? I
   : never;
 
-/**
- * Utility type to merge API client options while preserving type information
- */
-type MergeApiOptions<T extends Array<Partial<ApiClientOptions>>> = {
-  baseURL: string;
-  headers?: Record<string, string>;
-  withCredentials?: boolean;
-  queries: UnionToIntersection<NonNullable<T[number]['queries']>>;
-  mutations: UnionToIntersection<NonNullable<T[number]['mutations']>>;
-  onBeforeRequest?: T[number]['onBeforeRequest'];
-  onStartRequest?: T[number]['onStartRequest'];
-  onFinishRequest?: T[number]['onFinishRequest'];
-  onErrorRequest?: T[number]['onErrorRequest'];
-  onZodError?: T[number]['onZodError'];
-};

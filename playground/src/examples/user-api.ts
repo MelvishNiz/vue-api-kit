@@ -27,7 +27,7 @@ export const userQueries = {
     }).optional(),
     response: UserListSchema,
   },
-  
+
   getUser: {
     method: 'GET' as const,
     path: '/users/{id}',
@@ -36,7 +36,7 @@ export const userQueries = {
     }),
     response: UserSchema,
   },
-  
+
   // POST query for searching users
   searchUsers: {
     method: 'POST' as const,
@@ -61,7 +61,7 @@ export const userMutations = {
     }),
     response: UserSchema,
   },
-  
+
   updateUser: {
     method: 'PUT' as const,
     path: '/users/{id}',
@@ -74,7 +74,7 @@ export const userMutations = {
     }),
     response: UserSchema,
   },
-  
+
   deleteUser: {
     method: 'DELETE' as const,
     path: '/users/{id}',
