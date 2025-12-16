@@ -14,6 +14,14 @@ export default defineConfig({
         "**/*.config.ts",
         "**/*.d.ts",
       ],
+      // Note: Current coverage is ~11% overall due to client.ts complexity
+      // Future improvements should aim to increase this threshold
+      thresholds: {
+        lines: 10,
+        functions: 15,
+        branches: 8,
+        statements: 10,
+      },
     },
   },
 });
