@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.1.0...v1.1.1) (2025-12-16)
+
+### :zap: Refactor
+
+* Update mutation structure to use data object for consistency across API calls ([c24006c](https://github.com/MelvishNiz/vue-api-kit/commit/c24006c158cba10df3f02b8c4b2215e8089d8ea9))
+
 ## [1.1.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.0.0...v1.1.0) (2025-12-15)
 
 ### :sparkles: Features
