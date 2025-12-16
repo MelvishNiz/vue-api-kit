@@ -14,11 +14,15 @@ export default defineConfig({
       external: [
         "vue",
         "axios",
-        "lodash",
+        "lodash-es",
+        "zod",
+        /^zod\//,
       ],
     },
-    sourcemap: true,
+    sourcemap: false,
     emptyOutDir: true,
+    minify: "esbuild",
+    target: "esnext",
   },
   plugins: [
     dts({
