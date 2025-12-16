@@ -62,6 +62,7 @@
     "@semantic-release/release-notes-generator": "^14.0.1",
     "@types/bun": "latest",
     "@types/lodash-es": "^4.17.12",
+    "@vitest/coverage-v8": "^4.0.15",
     "@vitest/ui": "^4.0.15",
     "@vue/test-utils": "^2.4.6",
     "commitizen": "^4.3.0",
