@@ -7,10 +7,7 @@
 import { createApiClient, mergeQueries, mergeMutations } from '../../../dist';
 import { userQueries, userMutations } from './user-api';
 import { postQueries, postMutations } from './post-api';
-
-// ============================================================================
-// APPROACH 1: Merge queries and mutations separately, then create API client
-// ============================================================================
+import { productQueries, productMutations } from './define-helpers-example';
 
 export const api = createApiClient({
   baseURL: 'https://jsonplaceholder.typicode.com',
@@ -19,10 +16,10 @@ export const api = createApiClient({
   },
 
   // Merge all queries from different modules
-  queries: mergeQueries(userQueries, postQueries),
+  queries: mergeQueries(userQueries, postQueries, productQueries),
 
   // Merge all mutations from different modules
-  mutations: mergeMutations(userMutations, postMutations),
+  mutations: mergeMutations(userMutations, postMutations, productMutations),
 
   // Global handlers
   onBeforeRequest: async (config) => {

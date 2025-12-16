@@ -15,55 +15,20 @@ const ProductSchema = z.object({
 
 const ProductListSchema = z.array(ProductSchema);
 
-// ============================================================================
-// BEFORE: Using 'as const' (old approach)
-// ============================================================================
-
-const oldStyleQueries = {
-  getProducts: {
-    method: 'GET' as const,
-    path: '/products',
-    response: ProductListSchema,
-  },
-  getProduct: {
-    method: 'GET' as const,
-    path: '/products/{id}',
-    params: z.object({ id: z.number() }),
-    response: ProductSchema,
-  },
-};
-
-const oldStyleMutations = {
-  createProduct: {
-    method: 'POST' as const,
-    path: '/products',
-    data: z.object({
-      name: z.string(),
-      price: z.number(),
-      category: z.string(),
-    }),
-    response: ProductSchema,
-  },
-};
-
-// ============================================================================
-// AFTER: Using defineQuery and defineMutation (new approach)
-// ============================================================================
-
 export const productQueries = {
   getProducts: defineQuery({
     method: 'GET',
     path: '/products',
     response: ProductListSchema,
   }),
-  
+
   getProduct: defineQuery({
     method: 'GET',
     path: '/products/{id}',
     params: z.object({ id: z.number() }),
     response: ProductSchema,
   }),
-  
+
   searchProducts: defineQuery({
     method: 'POST',
     path: '/products/search',
@@ -88,7 +53,7 @@ export const productMutations = {
     }),
     response: ProductSchema,
   }),
-  
+
   updateProduct: defineMutation({
     method: 'PUT',
     path: '/products/{id}',
@@ -100,7 +65,7 @@ export const productMutations = {
     }),
     response: ProductSchema,
   }),
-  
+
   deleteProduct: defineMutation({
     method: 'DELETE',
     path: '/products/{id}',
@@ -119,7 +84,7 @@ export const productMutations = {
  * 3. ✅ More readable and consistent
  * 4. ✅ Zero runtime overhead (identity functions)
  * 5. ✅ Better developer experience
- * 
+ *
  * Both approaches provide the same type safety, but the new approach
  * is cleaner and more maintainable.
  */
