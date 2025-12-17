@@ -458,18 +458,23 @@ The client includes built-in CSRF token protection, perfect for Laravel Sanctum 
 
 ### How it works
 
-When you set `csrfRefreshEndpoint`, the client will:
-1. Automatically detect CSRF errors (403 or 419 status codes)
-2. Call the CSRF refresh endpoint to get a new token
-3. Retry the original request with the fresh token
-4. Prevent infinite loops and race conditions
+**Automatic XSRF Token Handling:**
+1. When `withCredentials: true`, the client automatically reads the `XSRF-TOKEN` cookie
+2. Decodes and sends it as `X-XSRF-TOKEN` header with every request
+3. This satisfies Laravel Sanctum's CSRF protection requirements
+
+**Automatic CSRF Refresh:**
+1. Detects CSRF errors (403 or 419 status codes)
+2. Calls the CSRF refresh endpoint to get a new token
+3. Retries the original request automatically with the fresh token
+4. Prevents infinite loops and race conditions
 
 ### Configuration
 
 ```typescript
 const api = createApiClient({
   baseURL: 'https://api.example.com',
-  withCredentials: true, // Required for CSRF cookies
+  withCredentials: true, // Required! Enables cookies AND auto XSRF header
   csrfRefreshEndpoint: '/sanctum/csrf-cookie', // Laravel Sanctum endpoint
 
   queries: { /* ... */ },
@@ -486,7 +491,7 @@ import { z } from 'zod';
 
 export const api = createApiClient({
   baseURL: 'https://api.example.com',
-  withCredentials: true, // Send cookies with requests
+  withCredentials: true, // Enables cookies AND automatic XSRF-TOKEN header
   csrfRefreshEndpoint: '/sanctum/csrf-cookie', // Laravel's CSRF endpoint
 
   mutations: {
@@ -519,11 +524,23 @@ export const api = createApiClient({
 
 ### Benefits
 
+- ✅ **Automatic XSRF Header**: Cookie automatically sent as `X-XSRF-TOKEN` header
 - ✅ **Automatic Recovery**: No manual token refresh needed
 - ✅ **Seamless UX**: Users don't experience authentication errors
 - ✅ **Race Condition Safe**: Multiple simultaneous requests share the same refresh
 - ✅ **Infinite Loop Prevention**: Won't retry the CSRF endpoint itself
 - ✅ **Laravel Sanctum Compatible**: Works perfectly with Laravel's SPA authentication
+
+### Important Notes
+
+1. **withCredentials is required**: Set `withCredentials: true` to enable both cookies and automatic XSRF token handling
+2. **Cookie Domain**: Ensure your API sets cookies with the correct domain (e.g., `.localhost` for local development)
+3. **CORS Configuration**: Your Laravel backend must allow credentials:
+   ```php
+   // config/cors.php
+   'supports_credentials' => true,
+   'allowed_origins' => ['http://localhost:5173'],
+   ```
 
 
 

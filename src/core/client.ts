@@ -143,6 +143,26 @@ export function createApiClient<
     return config;
   });
 
+  /* --------------------------- XSRF TOKEN HANDLER -------------------------- */
+
+  // Add XSRF token to request headers for Laravel Sanctum
+  if (options.withCredentials) {
+    client.interceptors.request.use((config) => {
+      // Get XSRF-TOKEN from cookie
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1];
+
+      if (token) {
+        // Decode the token and add it to headers
+        config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token);
+      }
+
+      return config;
+    });
+  }
+
   /* ----------------------------- CSRF REFRESH ------------------------------ */
 
   if (options.csrfRefreshEndpoint) {

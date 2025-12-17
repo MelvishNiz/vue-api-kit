@@ -527,4 +527,95 @@ describe("createApiClient - Runtime Behavior", () => {
       await expect(errorInterceptor.error(error)).rejects.toEqual(error);
     });
   });
+
+  describe("Interceptors - XSRF Token", () => {
+    beforeEach(() => {
+      // Mock document.cookie
+      Object.defineProperty(document, 'cookie', {
+        writable: true,
+        value: '',
+      });
+    });
+
+    it("should add X-XSRF-TOKEN header when withCredentials is true and cookie exists", () => {
+      let xsrfInterceptor: any;
+      let callCount = 0;
+
+      mockAxiosInstance.interceptors.request.use.mockImplementation(
+        (interceptor: any) => {
+          if (callCount === 1) {
+            xsrfInterceptor = interceptor;
+          }
+          callCount++;
+        }
+      );
+
+      // Set mock cookie
+      document.cookie = 'XSRF-TOKEN=test%20token%20value';
+
+      createApiClient({
+        baseURL: "https://api.example.com",
+        withCredentials: true,
+        queries: {},
+      });
+
+      const config = {
+        url: "/api/test",
+        headers: {},
+      };
+
+      xsrfInterceptor(config);
+
+      expect(config.headers['X-XSRF-TOKEN']).toBe('test token value');
+    });
+
+    it("should not add X-XSRF-TOKEN header when cookie does not exist", () => {
+      let xsrfInterceptor: any;
+      let callCount = 0;
+
+      mockAxiosInstance.interceptors.request.use.mockImplementation(
+        (interceptor: any) => {
+          if (callCount === 1) {
+            xsrfInterceptor = interceptor;
+          }
+          callCount++;
+        }
+      );
+
+      // No XSRF-TOKEN cookie
+      document.cookie = '';
+
+      createApiClient({
+        baseURL: "https://api.example.com",
+        withCredentials: true,
+        queries: {},
+      });
+
+      const config = {
+        url: "/api/test",
+        headers: {},
+      };
+
+      xsrfInterceptor(config);
+
+      expect(config.headers['X-XSRF-TOKEN']).toBeUndefined();
+    });
+
+    it("should not add XSRF interceptor when withCredentials is false", () => {
+      let interceptorCount = 0;
+
+      mockAxiosInstance.interceptors.request.use.mockImplementation(() => {
+        interceptorCount++;
+      });
+
+      createApiClient({
+        baseURL: "https://api.example.com",
+        withCredentials: false,
+        queries: {},
+      });
+
+      // Only path param handler should be registered
+      expect(interceptorCount).toBe(1);
+    });
+  });
 });
