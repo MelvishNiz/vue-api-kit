@@ -57,11 +57,7 @@ export function createApiClient<
 >(options: ApiClientOptions<Q, M>) {
   const client = axios.create({
     baseURL: options.baseURL,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      ...options.headers,
-    },
+    ...options.headers && { headers: options.headers },
     withCredentials: options.withCredentials ?? false,
   });
 
