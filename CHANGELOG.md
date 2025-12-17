@@ -1,3 +1,9 @@
+## [1.5.2](https://github.com/MelvishNiz/vue-api-kit/compare/v1.5.1...v1.5.2) (2025-12-17)
+
+### :bug: Fixes
+
+* **client:** update axios headers configuration and improve CSRF error handling ([0b86b69](https://github.com/MelvishNiz/vue-api-kit/commit/0b86b6927e526163692a4dd387e1bfd92f0ed8d3))
+
 ## [1.5.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.5.0...v1.5.1) (2025-12-17)
 
 ### :bug: Fixes
