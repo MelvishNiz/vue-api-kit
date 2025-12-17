@@ -1,3 +1,9 @@
+## [1.5.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.5.0...v1.5.1) (2025-12-17)
+
+### :bug: Fixes
+
+* **client:** simplify axios headers configuration in createApiClient ([605f706](https://github.com/MelvishNiz/vue-api-kit/commit/605f70657cb9b898179b9494de1a7aa765b9863f))
+
 ## [1.5.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.4.2...v1.5.0) (2025-12-17)
 
 ### :sparkles: Features
