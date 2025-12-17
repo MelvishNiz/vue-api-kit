@@ -237,6 +237,7 @@ async function handleSubmit() {
 - ✅ **File Upload**: Support for multipart/form-data in mutations
 - ✅ **Path Parameters**: Automatic path parameter replacement
 - ✅ **Debouncing**: Built-in request debouncing
+- ✅ **CSRF Protection**: Automatic CSRF token refresh on 403/419 errors
 - ✅ **Global Error Handling**: Centralized error management
 - ✅ **Request Interceptors**: Modify requests before sending
 - ✅ **Fully Typed**: Complete type inference for params, data, and response
@@ -252,6 +253,9 @@ const api = createApiClient({
   },
   withCredentials: true,
 
+  // CSRF Token Protection
+  csrfRefreshEndpoint: '/sanctum/csrf-cookie', // Auto-refresh CSRF token on 403/419 errors
+
   // Global handlers
   onBeforeRequest: async (config) => {
     // Modify request before sending
@@ -266,7 +270,7 @@ const api = createApiClient({
   },
 
   onFinishRequest: async () => {
-    // Called when request finishes
+    // Called when request finishes (success or error)
     console.log('Request finished');
   },
 
@@ -392,10 +396,10 @@ import { postQueries, postMutations } from './post-api';
 // Approach 1: Merge queries and mutations separately
 export const api = createApiClient({
   baseURL: 'https://api.example.com',
-  
+
   // Merge all queries from different modules
   queries: mergeQueries(userQueries, postQueries),
-  
+
   // Merge all mutations from different modules
   mutations: mergeMutations(userMutations, postMutations)
 });
@@ -447,6 +451,81 @@ async function handleUpload(file: File) {
   await mutate({ data: { file } });
 }
 ```
+
+## 🔒 CSRF Token Protection
+
+The client includes built-in CSRF token protection, perfect for Laravel Sanctum or similar CSRF-based authentication systems.
+
+### How it works
+
+When you set `csrfRefreshEndpoint`, the client will:
+1. Automatically detect CSRF errors (403 or 419 status codes)
+2. Call the CSRF refresh endpoint to get a new token
+3. Retry the original request with the fresh token
+4. Prevent infinite loops and race conditions
+
+### Configuration
+
+```typescript
+const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  withCredentials: true, // Required for CSRF cookies
+  csrfRefreshEndpoint: '/sanctum/csrf-cookie', // Laravel Sanctum endpoint
+
+  queries: { /* ... */ },
+  mutations: { /* ... */ }
+});
+```
+
+### Use Case: Laravel Sanctum
+
+```typescript
+// api.ts
+import { createApiClient } from 'vue-api-kit';
+import { z } from 'zod';
+
+export const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  withCredentials: true, // Send cookies with requests
+  csrfRefreshEndpoint: '/sanctum/csrf-cookie', // Laravel's CSRF endpoint
+
+  mutations: {
+    login: {
+      method: 'POST',
+      path: '/login',
+      data: z.object({
+        email: z.string().email(),
+        password: z.string()
+      }),
+      response: z.object({
+        user: z.object({
+          id: z.number(),
+          name: z.string(),
+          email: z.string()
+        })
+      })
+    },
+    createPost: {
+      method: 'POST',
+      path: '/posts',
+      data: z.object({
+        title: z.string(),
+        content: z.string()
+      })
+    }
+  }
+});
+```
+
+### Benefits
+
+- ✅ **Automatic Recovery**: No manual token refresh needed
+- ✅ **Seamless UX**: Users don't experience authentication errors
+- ✅ **Race Condition Safe**: Multiple simultaneous requests share the same refresh
+- ✅ **Infinite Loop Prevention**: Won't retry the CSRF endpoint itself
+- ✅ **Laravel Sanctum Compatible**: Works perfectly with Laravel's SPA authentication
+
+
 
 ## 📝 License
 

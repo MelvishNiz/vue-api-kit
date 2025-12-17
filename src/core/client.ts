@@ -65,6 +65,10 @@ export function createApiClient<
     withCredentials: options.withCredentials ?? false,
   });
 
+  // CSRF refresh state to prevent race conditions
+  let isRefreshingCsrf = false;
+  let csrfRefreshPromise: Promise<void> | null = null;
+
   /* ------------------------- BEFORE REQUEST HANDLER ------------------------ */
 
   if (options.onBeforeRequest) {
@@ -104,6 +108,7 @@ export function createApiClient<
         return response;
       },
       (error) => {
+        options.onFinishRequest!();
         return Promise.reject(error);
       }
     );
@@ -137,6 +142,57 @@ export function createApiClient<
     replaceParams(config.params);
     return config;
   });
+
+  /* ----------------------------- CSRF REFRESH ------------------------------ */
+
+  if (options.csrfRefreshEndpoint) {
+    client.interceptors.response.use(
+      (res) => res,
+      async (error: AxiosError) => {
+        const originalRequest = error.config as any;
+
+        // Prevent infinite loop: don't retry CSRF refresh endpoint itself
+        if (originalRequest.url === options.csrfRefreshEndpoint) {
+          return Promise.reject(error);
+        }
+
+        // Check if error is CSRF related (403 or 419 status codes)
+        if (
+          error.response &&
+          (error.response.status === 403 || error.response.status === 419) &&
+          !originalRequest._retry
+        ) {
+          originalRequest._retry = true;
+
+          try {
+            // Prevent race condition: reuse existing refresh promise if already refreshing
+            if (isRefreshingCsrf && csrfRefreshPromise) {
+              await csrfRefreshPromise;
+            } else {
+              isRefreshingCsrf = true;
+              csrfRefreshPromise = client.get(options.csrfRefreshEndpoint!, {
+                // Mark this request to prevent retry
+                _skipRetry: true
+              } as any).then(() => {
+                isRefreshingCsrf = false;
+                csrfRefreshPromise = null;
+              });
+              await csrfRefreshPromise;
+            }
+
+            // Retry the original request with fresh CSRF token
+            return client(originalRequest);
+          } catch (refreshError) {
+            isRefreshingCsrf = false;
+            csrfRefreshPromise = null;
+            return Promise.reject(refreshError);
+          }
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  }
 
   /* ----------------------------- RESPONSE ERROR ---------------------------- */
 

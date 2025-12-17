@@ -85,6 +85,8 @@ export interface ApiMutation<
  * const options: ApiClientOptions = {
  *   baseURL: "https://api.example.com",
  *   headers: { Authorization: "Bearer token" },
+ *   withCredentials: true,
+ *   csrfRefreshEndpoint: "/auth/refresh-csrf",
  *   queries: { getUsers: { path: "/users" } },
  *   mutations: { createUser: { method: "POST", path: "/users" } },
  *   onErrorRequest: (error) => console.error(error.message)
@@ -97,6 +99,7 @@ export interface ApiClientOptions<
   baseURL: string;
   headers?: Record<string, string>;
   withCredentials?: boolean;
+  csrfRefreshEndpoint?: string;
   queries?: Q;
   mutations?: M;
   onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
