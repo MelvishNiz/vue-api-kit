@@ -1,3 +1,9 @@
+## [1.6.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.5.2...v1.6.0) (2025-12-17)
+
+### :sparkles: Features
+
+* **client:** implement automatic XSRF token handling and update documentation ([263fa48](https://github.com/MelvishNiz/vue-api-kit/commit/263fa48ad80bf289177cf1f3d0e15273aa9405e3))
+
 ## [1.5.2](https://github.com/MelvishNiz/vue-api-kit/compare/v1.5.1...v1.5.2) (2025-12-17)
 
 ### :bug: Fixes
