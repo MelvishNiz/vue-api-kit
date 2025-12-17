@@ -342,7 +342,12 @@ export function createApiClient<
       const isDone = ref(false);
       const uploadProgress = ref(0);
 
-      const mutate = async (props: {data?: any, params?: any}) => {
+      const mutate = async (
+        args?: {
+          data?: Infer<typeof m.data>;
+          params?: Infer<typeof m.params>;
+        }
+      ) => {
         if (isLoading.value) return;
         isLoading.value = true;
         errorMessage.value = undefined;
@@ -350,7 +355,7 @@ export function createApiClient<
 
         try {
           // Extract params if exists
-          const {data: dataWithoutParams, params} = props;
+          const { data: dataWithoutParams = {}, params } = args ?? {};
 
           // Prepare request data
           let requestData: any = dataWithoutParams ?? {};

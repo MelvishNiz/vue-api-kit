@@ -192,5 +192,5 @@ export interface MutationResult<TResult, TData = any, TParams = any> {
   isLoading: Ref<boolean>;
   isDone: Ref<boolean>;
   uploadProgress: Ref<number>;
-  mutate: ({data, params}: {data?: TData; params?: TParams}) => Promise<void>;
+  mutate: (rgs?: { data?: TData; params?: TParams }) => Promise<void>;
 }
