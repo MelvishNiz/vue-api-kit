@@ -1,3 +1,17 @@
+## [1.5.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.4.2...v1.5.0) (2025-12-17)
+
+### :sparkles: Features
+
+* **csrf:** add automatic CSRF token refresh on 403/419 errors ([3e1912b](https://github.com/MelvishNiz/vue-api-kit/commit/3e1912bcde3fd913137443f7824a1425bd2edd9a))
+
+### :bug: Fixes
+
+* **types:** update mutate function signature to use optional args ([917b80f](https://github.com/MelvishNiz/vue-api-kit/commit/917b80faac3f94bbf081a28abfb6bbc490e68607))
+
+### :white_check_mark: Tests
+
+* **client:** add comprehensive tests for createApiClient interceptors and behavior ([65bd074](https://github.com/MelvishNiz/vue-api-kit/commit/65bd074bde57b02a21197876a07cc7bdf5832fa3))
+
 ## [1.4.2](https://github.com/MelvishNiz/vue-api-kit/compare/v1.4.1...v1.4.2) (2025-12-16)
 
 ### :bug: Fixes
