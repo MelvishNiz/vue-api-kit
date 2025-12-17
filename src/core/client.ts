@@ -57,7 +57,11 @@ export function createApiClient<
 >(options: ApiClientOptions<Q, M>) {
   const client = axios.create({
     baseURL: options.baseURL,
-    ...options.headers && { headers: options.headers },
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...options.headers,
+    },
     withCredentials: options.withCredentials ?? false,
   });
 
@@ -148,7 +152,7 @@ export function createApiClient<
         const originalRequest = error.config as any;
 
         // Prevent infinite loop: don't retry CSRF refresh endpoint itself
-        if (originalRequest.url === options.csrfRefreshEndpoint) {
+        if (originalRequest?.url === options.csrfRefreshEndpoint) {
           return Promise.reject(error);
         }
 
@@ -156,7 +160,7 @@ export function createApiClient<
         if (
           error.response &&
           (error.response.status === 403 || error.response.status === 419) &&
-          !originalRequest._retry
+          !originalRequest?._retry
         ) {
           originalRequest._retry = true;
 
@@ -166,10 +170,7 @@ export function createApiClient<
               await csrfRefreshPromise;
             } else {
               isRefreshingCsrf = true;
-              csrfRefreshPromise = client.get(options.csrfRefreshEndpoint!, {
-                // Mark this request to prevent retry
-                _skipRetry: true
-              } as any).then(() => {
+              csrfRefreshPromise = client.get(options.csrfRefreshEndpoint!).then(() => {
                 isRefreshingCsrf = false;
                 csrfRefreshPromise = null;
               });
@@ -177,7 +178,7 @@ export function createApiClient<
             }
 
             // Retry the original request with fresh CSRF token
-            return client(originalRequest);
+            return client.request(originalRequest);
           } catch (refreshError) {
             isRefreshingCsrf = false;
             csrfRefreshPromise = null;

@@ -317,9 +317,7 @@ describe("createApiClient - Runtime Behavior", () => {
 
       await csrfInterceptor(error);
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(csrfRefreshEndpoint, {
-        _skipRetry: true,
-      });
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith(csrfRefreshEndpoint);
     });
 
     it("should handle CSRF 419 error and retry request", async () => {
@@ -352,9 +350,7 @@ describe("createApiClient - Runtime Behavior", () => {
 
       await csrfInterceptor(error);
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(csrfRefreshEndpoint, {
-        _skipRetry: true,
-      });
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith(csrfRefreshEndpoint);
     });
 
     it("should not retry if already retried (_retry flag)", async () => {
