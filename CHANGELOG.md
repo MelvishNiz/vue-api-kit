@@ -1,3 +1,18 @@
+## [1.9.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.8.0...v1.9.0) (2025-12-18)
+
+### :sparkles: Features
+
+* Add multi-level nested API structure support ([81776a7](https://github.com/MelvishNiz/vue-api-kit/commit/81776a7221372bd8bb94a3152313686f31220f2d))
+
+### :zap: Refactor
+
+* Extract isApiDefinition to shared utils and add safety checks ([d63d66b](https://github.com/MelvishNiz/vue-api-kit/commit/d63d66bb1c5222aab78f31f0cde1e66e39bc0162))
+* Extract shared isApiDefinition helper and remove unused code ([c73b780](https://github.com/MelvishNiz/vue-api-kit/commit/c73b780c077ed34241c6d0db66f5fc635a4fdead))
+
+### :repeat: Chore
+
+* Update .gitignore to exclude manual test files ([57fd3e4](https://github.com/MelvishNiz/vue-api-kit/commit/57fd3e419b4919b9c3ce2946f2aa87220c20519e))
+
 ## [1.8.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.7.0...v1.8.0) (2025-12-18)
 
 ### :sparkles: Features
