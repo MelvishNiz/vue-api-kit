@@ -1,3 +1,9 @@
+## [1.8.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.7.0...v1.8.0) (2025-12-18)
+
+### :sparkles: Features
+
+* **onbeforerequest:** add onBeforeRequest handler ([0b0a29f](https://github.com/MelvishNiz/vue-api-kit/commit/0b0a29f2149b4697e5ade60c5b76ff857d6fd075))
+
 ## [1.7.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.6.0...v1.7.0) (2025-12-18)
 
 ### :sparkles: Features
