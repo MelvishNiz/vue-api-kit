@@ -290,6 +290,133 @@ const api = createApiClient({
 });
 ```
 
+## 🎯 Per-Query and Per-Mutation Request Interceptors
+
+In addition to global request interceptors, you can define `onBeforeRequest` hooks for individual queries and mutations. This is useful when you need to append specific headers or modify the request configuration for certain endpoints only.
+
+### Query-Level onBeforeRequest
+
+You can define `onBeforeRequest` in two ways for queries:
+
+**1. In the query definition:**
+
+```typescript
+const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  queries: {
+    getUser: {
+      path: '/users/{id}',
+      params: z.object({ id: z.number() }),
+      response: z.object({ id: z.number(), name: z.string() }),
+      // Query-level interceptor
+      onBeforeRequest: async (config) => {
+        config.headers['X-Custom-Query-Header'] = 'special-value';
+        return config;
+      }
+    }
+  }
+});
+```
+
+**2. In the query options when calling it:**
+
+```typescript
+const { result, isLoading } = api.query.getUser({
+  params: { id: 1 },
+  // Runtime interceptor
+  onBeforeRequest: async (config) => {
+    const token = await getAuthToken();
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  }
+});
+```
+
+### Mutation-Level onBeforeRequest
+
+Similarly, you can define `onBeforeRequest` for mutations:
+
+**1. In the mutation definition:**
+
+```typescript
+const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  mutations: {
+    createUser: {
+      method: 'POST',
+      path: '/users',
+      data: z.object({ name: z.string(), email: z.string() }),
+      response: z.object({ id: z.number(), name: z.string() }),
+      // Mutation-level interceptor
+      onBeforeRequest: async (config) => {
+        config.headers['X-Action'] = 'create-user';
+        return config;
+      }
+    }
+  }
+});
+```
+
+**2. In the mutation options when calling it:**
+
+```typescript
+const { mutate } = api.mutation.createUser({
+  // Runtime interceptor
+  onBeforeRequest: async (config) => {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (csrfToken) {
+      config.headers['X-CSRF-Token'] = csrfToken;
+    }
+    return config;
+  }
+});
+
+await mutate({ data: { name: 'John', email: 'john@example.com' } });
+```
+
+### Execution Order
+
+When multiple `onBeforeRequest` hooks are defined, they execute in the following order:
+
+1. **Global interceptor** (defined in `createApiClient` options) - Applied via axios interceptor
+2. **Query/Mutation definition interceptor** (defined in query/mutation object)
+3. **Options interceptor** (defined when calling the query/mutation)
+
+Each hook can modify the config, and later hooks can see and override changes made by earlier hooks.
+
+### Use Cases
+
+- **Authentication**: Add tokens for specific endpoints that require authentication
+- **Custom Headers**: Append API keys, correlation IDs, or feature flags for specific requests
+- **Request Transformation**: Modify request data or parameters before sending
+- **Conditional Logic**: Apply different configurations based on runtime conditions
+- **Debugging**: Add request IDs or trace headers for specific endpoints
+
+### Example: Dynamic Authorization
+
+```typescript
+const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  queries: {
+    getProtectedData: {
+      path: '/protected/data',
+      response: z.object({ data: z.string() }),
+      onBeforeRequest: async (config) => {
+        // This query always needs fresh token
+        const token = await refreshAndGetToken();
+        config.headers.Authorization = `Bearer ${token}`;
+        return config;
+      }
+    },
+    getPublicData: {
+      path: '/public/data',
+      response: z.object({ data: z.string() })
+      // No onBeforeRequest needed for public endpoint
+    }
+  }
+});
+```
+
 ## 🧩 Modular API Definitions
 
 For large applications, you can organize your API definitions into separate files and merge them together with full type safety.
