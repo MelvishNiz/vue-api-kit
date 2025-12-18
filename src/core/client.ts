@@ -10,17 +10,12 @@ import type { $ZodIssue } from "zod/v4/core";
 /* -------------------------------------------------------------------------- */
 
 /**
- * Check if an object is an ApiQuery
+ * Check if an object is an API definition (has a 'path' property)
+ * @param obj - Object to check
+ * @returns True if the object is an API definition
  */
-function isApiQuery(obj: any): obj is ApiQuery {
-  return obj && typeof obj === "object" && "path" in obj && !("method" in obj && ["POST", "PUT", "PATCH", "DELETE"].includes(obj.method as any) && !["GET", "POST"].includes(obj.method as any));
-}
-
-/**
- * Check if an object is an ApiMutation
- */
-function isApiMutation(obj: any): obj is ApiMutation {
-  return obj && typeof obj === "object" && "path" in obj && "method" in obj;
+function isApiDefinition(obj: any): boolean {
+  return obj && typeof obj === "object" && "path" in obj;
 }
 
 /**
@@ -38,8 +33,8 @@ function flattenDefinitions<T extends ApiQuery | ApiMutation>(
   for (const [key, value] of Object.entries(definitions)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
 
-    // Check if value is an API definition (has a 'path' property) or nested object
-    if (value && typeof value === "object" && "path" in value) {
+    // Check if value is an API definition or nested object
+    if (isApiDefinition(value)) {
       // It's an API definition
       result[fullKey] = value as T;
     } else if (value && typeof value === "object") {

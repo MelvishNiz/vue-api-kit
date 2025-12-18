@@ -48,6 +48,15 @@ export function defineMutation<T extends ApiMutation>(mutation: T): T {
 /* -------------------------------------------------------------------------- */
 
 /**
+ * Check if an object is an API definition (has a 'path' property)
+ * @param obj - Object to check
+ * @returns True if the object is an API definition
+ */
+function isApiDefinition(obj: any): boolean {
+  return obj && typeof obj === "object" && "path" in obj;
+}
+
+/**
  * Deep merge utility that handles nested objects
  */
 function deepMerge<T extends Record<string, any>>(...objects: T[]): T {
@@ -55,7 +64,7 @@ function deepMerge<T extends Record<string, any>>(...objects: T[]): T {
 
   for (const obj of objects) {
     for (const [key, value] of Object.entries(obj)) {
-      if (value && typeof value === 'object' && !Array.isArray(value) && !('path' in value)) {
+      if (value && typeof value === 'object' && !Array.isArray(value) && !isApiDefinition(value)) {
         // It's a nested object (not an API definition), merge recursively
         result[key] = deepMerge(result[key] || {}, value);
       } else {
