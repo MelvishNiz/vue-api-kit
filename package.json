@@ -1,7 +1,7 @@
 {
   "name": "vue-api-kit",
   "type": "module",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "A powerful and flexible API client for Vue 3 applications, built with TypeScript and Zod for type-safe API interactions.",
   "keywords": [
     "vue3",

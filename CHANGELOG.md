@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.6.0...v1.7.0) (2025-12-18)
+
+### :sparkles: Features
+
+* **client:** add automatic XSRF token handling and login functionality ([cd15c38](https://github.com/MelvishNiz/vue-api-kit/commit/cd15c383c1643256ce9187f34335361f7ca92f9f))
+
 ## [1.6.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.5.2...v1.6.0) (2025-12-17)
 
 ### :sparkles: Features
