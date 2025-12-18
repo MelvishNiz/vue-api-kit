@@ -7,6 +7,7 @@ import CreatePost from './components/CreatePost.vue';
 import UpdatePost from './components/UpdatePost.vue';
 import DeletePost from './components/DeletePost.vue';
 import UploadImage from './components/UploadImage.vue';
+import LoginPost from './components/LoginPost.vue';
 
 const activeTab = ref('posts');
 
@@ -18,6 +19,7 @@ const tabs = [
   { id: 'update', name: 'Update Post', icon: '✏️' },
   { id: 'delete', name: 'Delete Post', icon: '🗑️' },
   { id: 'upload', name: 'Upload Image', icon: '📤' },
+  { id: 'login', name: 'Login', icon: '🔐' },
 ];
 </script>
 
@@ -59,6 +61,7 @@ const tabs = [
         <UpdatePost v-if="activeTab === 'update'" />
         <DeletePost v-if="activeTab === 'delete'" />
         <UploadImage v-if="activeTab === 'upload'" />
+        <LoginPost v-if="activeTab === 'login'" />
       </div>
 
       <!-- Footer -->

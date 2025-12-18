@@ -99,6 +99,7 @@ export interface ApiClientOptions<
   baseURL: string;
   headers?: Record<string, string>;
   withCredentials?: boolean;
+  withXSRFToken?: boolean;
   csrfRefreshEndpoint?: string;
   queries?: Q;
   mutations?: M;

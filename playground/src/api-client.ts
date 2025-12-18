@@ -140,3 +140,38 @@ export const useApiUpload = createApiClient({
     },
   }
 });
+
+export const useApiSanctum = createApiClient({
+  baseURL: "http://localhost",
+  withCredentials: true,
+  csrfRefreshEndpoint: "/sanctum/csrf-cookie",
+  mutations: {
+    authLogin: {
+      method: "POST",
+      path: "/api/auth/login",
+      data: z.object({
+        email: z.email(),
+        password: z.string(),
+        is_remember_me: z.boolean(),
+      }),
+      response: z.object({
+        success: z.boolean(),
+        data: z.object({
+          session: z.object({
+            token: z.string().nullable(),
+            user: z.object({
+              id: z.number(),
+              name: z.string(),
+              email: z.email(),
+              type: z.enum(["superadmin", "user"]),
+              is_active: z.boolean(),
+              email_verified_at: z.union([z.string(), z.date(), z.undefined()]),
+              created_at: z.union([z.string(), z.date(), z.undefined()]),
+              updated_at: z.union([z.string(), z.date(), z.undefined()]),
+            }),
+          })
+        }),
+      }),
+    }
+  }
+})

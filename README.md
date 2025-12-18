@@ -251,7 +251,8 @@ const api = createApiClient({
   headers: {
     'Authorization': 'Bearer token'
   },
-  withCredentials: true,
+  withCredentials: true, // Enable cookies
+  withXSRFToken: true,   // Enable automatic XSRF token handling
 
   // CSRF Token Protection
   csrfRefreshEndpoint: '/sanctum/csrf-cookie', // Auto-refresh CSRF token on 403/419 errors
@@ -459,9 +460,10 @@ The client includes built-in CSRF token protection, perfect for Laravel Sanctum 
 ### How it works
 
 **Automatic XSRF Token Handling:**
-1. When `withCredentials: true`, the client automatically reads the `XSRF-TOKEN` cookie
-2. Decodes and sends it as `X-XSRF-TOKEN` header with every request
-3. This satisfies Laravel Sanctum's CSRF protection requirements
+1. Set `withCredentials: true` to enable cookie-based authentication
+2. Set `withXSRFToken: true` to enable automatic XSRF token handling
+3. Axios automatically reads `XSRF-TOKEN` cookie and sends it as `X-XSRF-TOKEN` header
+4. This satisfies Laravel Sanctum's CSRF protection requirements
 
 **Automatic CSRF Refresh:**
 1. Detects CSRF errors (403 or 419 status codes)
@@ -474,9 +476,9 @@ The client includes built-in CSRF token protection, perfect for Laravel Sanctum 
 ```typescript
 const api = createApiClient({
   baseURL: 'https://api.example.com',
-  withCredentials: true, // Required! Enables cookies AND auto XSRF header
+  withCredentials: true,   // Enable cookies for authentication
+  withXSRFToken: true,     // Enable automatic XSRF token handling
   csrfRefreshEndpoint: '/sanctum/csrf-cookie', // Laravel Sanctum endpoint
-
   queries: { /* ... */ },
   mutations: { /* ... */ }
 });
@@ -491,10 +493,9 @@ import { z } from 'zod';
 
 export const api = createApiClient({
   baseURL: 'https://api.example.com',
-  withCredentials: true, // Enables cookies AND automatic XSRF-TOKEN header
-  csrfRefreshEndpoint: '/sanctum/csrf-cookie', // Laravel's CSRF endpoint
-
-  mutations: {
+  withCredentials: true,   // Enables cookies
+  withXSRFToken: true,     // Enables automatic XSRF-TOKEN header
+  csrfRefreshEndpoint: '/sanctum/csrf-cookie', // Laravel's CSRF endpoint  mutations: {
     login: {
       method: 'POST',
       path: '/login',
@@ -524,7 +525,8 @@ export const api = createApiClient({
 
 ### Benefits
 
-- ✅ **Automatic XSRF Header**: Cookie automatically sent as `X-XSRF-TOKEN` header
+- ✅ **Separate Options**: `withCredentials` and `withXSRFToken` can be configured independently
+- ✅ **Built-in XSRF Support**: Axios `withXSRFToken` handles token automatically
 - ✅ **Automatic Recovery**: No manual token refresh needed
 - ✅ **Seamless UX**: Users don't experience authentication errors
 - ✅ **Race Condition Safe**: Multiple simultaneous requests share the same refresh
@@ -533,7 +535,9 @@ export const api = createApiClient({
 
 ### Important Notes
 
-1. **withCredentials is required**: Set `withCredentials: true` to enable both cookies and automatic XSRF token handling
+1. **Two separate options**:
+   - `withCredentials: true` - Enables sending cookies with requests
+   - `withXSRFToken: true` - Enables automatic XSRF token header handling
 2. **Cookie Domain**: Ensure your API sets cookies with the correct domain (e.g., `.localhost` for local development)
 3. **CORS Configuration**: Your Laravel backend must allow credentials:
    ```php
