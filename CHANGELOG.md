@@ -1,3 +1,9 @@
+## [1.8.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.8.0...v1.8.1) (2025-12-18)
+
+### :zap: Refactor
+
+* **package:** remove package lock npm ([cd893a9](https://github.com/MelvishNiz/vue-api-kit/commit/cd893a970dac8ffcb7fb236837fa9da2dfad7bff))
+
 ## [1.8.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.7.0...v1.8.0) (2025-12-18)
 
 ### :sparkles: Features
