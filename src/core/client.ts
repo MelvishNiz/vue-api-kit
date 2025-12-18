@@ -281,6 +281,22 @@ export function createApiClient<
             requestConfig.data = requestData;
           }
 
+          // Apply query-level onBeforeRequest hook
+          if (q.onBeforeRequest) {
+            const modifiedConfig = await q.onBeforeRequest(requestConfig);
+            if (modifiedConfig) {
+              Object.assign(requestConfig, modifiedConfig);
+            }
+          }
+
+          // Apply options-level onBeforeRequest hook
+          if (queryOptions?.onBeforeRequest) {
+            const modifiedConfig = await queryOptions.onBeforeRequest(requestConfig);
+            if (modifiedConfig) {
+              Object.assign(requestConfig, modifiedConfig);
+            }
+          }
+
           const res = await client.request(requestConfig);
 
           const parsedData = q.response
@@ -449,7 +465,7 @@ export function createApiClient<
             (m.params as ZodType<any>).parse(params);
           }
 
-          const res = await client.request({
+          const requestConfig: any = {
             method: m.method,
             url: m.path,
             data: requestData,
@@ -462,7 +478,25 @@ export function createApiClient<
                 mutationOptions?.onUploadProgress?.(progress);
               }
             },
-          });
+          };
+
+          // Apply mutation-level onBeforeRequest hook
+          if (m.onBeforeRequest) {
+            const modifiedConfig = await m.onBeforeRequest(requestConfig);
+            if (modifiedConfig) {
+              Object.assign(requestConfig, modifiedConfig);
+            }
+          }
+
+          // Apply options-level onBeforeRequest hook
+          if (mutationOptions?.onBeforeRequest) {
+            const modifiedConfig = await mutationOptions.onBeforeRequest(requestConfig);
+            if (modifiedConfig) {
+              Object.assign(requestConfig, modifiedConfig);
+            }
+          }
+
+          const res = await client.request(requestConfig);
 
           const parsedData = m.response
             ? (m.response as ZodType<any>).parse(res.data)

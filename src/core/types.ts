@@ -49,6 +49,7 @@ export interface ApiQuery<
   params?: TParams;
   data?: TData;
   response?: TResponse;
+  onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
 }
 
 /**
@@ -75,6 +76,7 @@ export interface ApiMutation<
   data?: TData;
   response?: TResponse;
   isMultipart?: boolean;
+  onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
 }
 
 /**
@@ -138,6 +140,7 @@ export interface UseQueryOptions<TParams = any, TData = any, TResult = any> {
   onResult?: (result: TResult) => void;
   onError?: (error: AxiosError | ZodError | Error) => void;
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
+  onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
 }
 
 /**
@@ -155,6 +158,7 @@ export interface UseMutationOptions<TResult = any> {
   onError?: (error: AxiosError | ZodError | Error) => void;
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
   onUploadProgress?: (progress: number) => void;
+  onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
 }
 
 /**
