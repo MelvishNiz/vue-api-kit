@@ -1,4 +1,5 @@
 import type { ApiQuery, ApiMutation, NestedApiDefinitions } from "./types";
+import { isApiDefinition } from "./utils";
 
 /* -------------------------------------------------------------------------- */
 /*                           DEFINE HELPERS                                   */
@@ -46,15 +47,6 @@ export function defineMutation<T extends ApiMutation>(mutation: T): T {
 /* -------------------------------------------------------------------------- */
 /*                           MERGE UTILITIES                                  */
 /* -------------------------------------------------------------------------- */
-
-/**
- * Check if an object is an API definition (has a 'path' property)
- * @param obj - Object to check
- * @returns True if the object is an API definition
- */
-function isApiDefinition(obj: any): boolean {
-  return obj && typeof obj === "object" && "path" in obj;
-}
 
 /**
  * Deep merge utility that handles nested objects

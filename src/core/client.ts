@@ -4,19 +4,11 @@ import { ZodError, type ZodType } from "zod";
 import { debounce } from "lodash-es";
 import type { ApiClientOptions, ApiMutation, ApiQuery, Infer, MutationResult, QueryResult, UseMutationOptions, UseQueryOptions, NestedApiDefinitions } from "./types";
 import type { $ZodIssue } from "zod/v4/core";
+import { isApiDefinition } from "./utils";
 
 /* -------------------------------------------------------------------------- */
 /*                              HELPER FUNCTIONS                               */
 /* -------------------------------------------------------------------------- */
-
-/**
- * Check if an object is an API definition (has a 'path' property)
- * @param obj - Object to check
- * @returns True if the object is an API definition
- */
-function isApiDefinition(obj: any): boolean {
-  return obj && typeof obj === "object" && "path" in obj;
-}
 
 /**
  * Flatten nested API definitions into a flat structure with dot notation keys
@@ -60,11 +52,18 @@ function rebuildNested<T>(
 
   for (const [key, definition] of Object.entries(flatDefinitions)) {
     const parts = key.split(".");
+    
+    // Handle edge case: empty key
+    if (parts.length === 0) continue;
+    
     let current = result;
 
     // Navigate/create nested structure
     for (let i = 0; i < parts.length - 1; i++) {
-      const part = parts[i]!;
+      const part = parts[i];
+      // Skip if part is undefined or empty
+      if (!part) continue;
+      
       if (!current[part]) {
         current[part] = {};
       }
@@ -72,8 +71,10 @@ function rebuildNested<T>(
     }
 
     // Set the final hook
-    const finalKey = parts[parts.length - 1]!;
-    current[finalKey] = createHook(definition);
+    const finalKey = parts[parts.length - 1];
+    if (finalKey) {
+      current[finalKey] = createHook(definition);
+    }
   }
 
   return result;
