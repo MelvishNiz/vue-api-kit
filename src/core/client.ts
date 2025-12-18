@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, type AxiosProgressEvent } from "axios";
 import { nextTick, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { ZodError, type ZodType } from "zod";
 import { debounce } from "lodash-es";
@@ -227,6 +227,8 @@ export function createApiClient<
                                 'debounce' in paramsOrOptions ||
                                 'onResult' in paramsOrOptions ||
                                 'onError' in paramsOrOptions ||
+                                'onZodError' in paramsOrOptions ||
+                                'onBeforeRequest' in paramsOrOptions ||
                                 'data' in paramsOrOptions;
         if (hasOptionsProps) {
           queryOptions = paramsOrOptions;
@@ -284,7 +286,8 @@ export function createApiClient<
           // Apply query-level onBeforeRequest hook
           if (q.onBeforeRequest) {
             const modifiedConfig = await q.onBeforeRequest(requestConfig);
-            if (modifiedConfig) {
+            // If a new config is returned, use it; otherwise the hook modified in-place
+            if (modifiedConfig !== undefined) {
               Object.assign(requestConfig, modifiedConfig);
             }
           }
@@ -292,7 +295,8 @@ export function createApiClient<
           // Apply options-level onBeforeRequest hook
           if (queryOptions?.onBeforeRequest) {
             const modifiedConfig = await queryOptions.onBeforeRequest(requestConfig);
-            if (modifiedConfig) {
+            // If a new config is returned, use it; otherwise the hook modified in-place
+            if (modifiedConfig !== undefined) {
               Object.assign(requestConfig, modifiedConfig);
             }
           }
@@ -471,7 +475,7 @@ export function createApiClient<
             data: requestData,
             params: params,
             headers,
-            onUploadProgress: (progressEvent) => {
+            onUploadProgress: (progressEvent: AxiosProgressEvent) => {
               if (progressEvent.total) {
                 const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                 uploadProgress.value = progress;
@@ -483,7 +487,8 @@ export function createApiClient<
           // Apply mutation-level onBeforeRequest hook
           if (m.onBeforeRequest) {
             const modifiedConfig = await m.onBeforeRequest(requestConfig);
-            if (modifiedConfig) {
+            // If a new config is returned, use it; otherwise the hook modified in-place
+            if (modifiedConfig !== undefined) {
               Object.assign(requestConfig, modifiedConfig);
             }
           }
@@ -491,7 +496,8 @@ export function createApiClient<
           // Apply options-level onBeforeRequest hook
           if (mutationOptions?.onBeforeRequest) {
             const modifiedConfig = await mutationOptions.onBeforeRequest(requestConfig);
-            if (modifiedConfig) {
+            // If a new config is returned, use it; otherwise the hook modified in-place
+            if (modifiedConfig !== undefined) {
               Object.assign(requestConfig, modifiedConfig);
             }
           }
