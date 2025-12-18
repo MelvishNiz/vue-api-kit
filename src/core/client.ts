@@ -2,8 +2,87 @@ import axios, { AxiosError, type AxiosProgressEvent } from "axios";
 import { nextTick, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { ZodError, type ZodType } from "zod";
 import { debounce } from "lodash-es";
-import type { ApiClientOptions, ApiMutation, ApiQuery, Infer, MutationResult, QueryResult, UseMutationOptions, UseQueryOptions } from "./types";
+import type { ApiClientOptions, ApiMutation, ApiQuery, Infer, MutationResult, QueryResult, UseMutationOptions, UseQueryOptions, NestedApiDefinitions } from "./types";
 import type { $ZodIssue } from "zod/v4/core";
+
+/* -------------------------------------------------------------------------- */
+/*                              HELPER FUNCTIONS                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Check if an object is an ApiQuery
+ */
+function isApiQuery(obj: any): obj is ApiQuery {
+  return obj && typeof obj === "object" && "path" in obj && !("method" in obj && ["POST", "PUT", "PATCH", "DELETE"].includes(obj.method as any) && !["GET", "POST"].includes(obj.method as any));
+}
+
+/**
+ * Check if an object is an ApiMutation
+ */
+function isApiMutation(obj: any): obj is ApiMutation {
+  return obj && typeof obj === "object" && "path" in obj && "method" in obj;
+}
+
+/**
+ * Flatten nested API definitions into a flat structure with dot notation keys
+ * @param definitions - Nested API definitions
+ * @param prefix - Current path prefix for recursion
+ * @returns Flattened definitions with keys like "auth.login"
+ */
+function flattenDefinitions<T extends ApiQuery | ApiMutation>(
+  definitions: NestedApiDefinitions<T>,
+  prefix: string = ""
+): Record<string, T> {
+  const result: Record<string, T> = {};
+
+  for (const [key, value] of Object.entries(definitions)) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+
+    // Check if value is an API definition (has a 'path' property) or nested object
+    if (value && typeof value === "object" && "path" in value) {
+      // It's an API definition
+      result[fullKey] = value as T;
+    } else if (value && typeof value === "object") {
+      // It's a nested object, recurse
+      Object.assign(result, flattenDefinitions(value as NestedApiDefinitions<T>, fullKey));
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Rebuild nested structure from flat definitions
+ * @param flatDefinitions - Flat definitions with dot notation keys
+ * @param createHook - Function to create hook from definition
+ * @returns Nested structure
+ */
+function rebuildNested<T>(
+  flatDefinitions: Record<string, any>,
+  createHook: (def: any) => T
+): any {
+  const result: any = {};
+
+  for (const [key, definition] of Object.entries(flatDefinitions)) {
+    const parts = key.split(".");
+    let current = result;
+
+    // Navigate/create nested structure
+    for (let i = 0; i < parts.length - 1; i++) {
+      const part = parts[i]!;
+      if (!current[part]) {
+        current[part] = {};
+      }
+      current = current[part];
+    }
+
+    // Set the final hook
+    const finalKey = parts[parts.length - 1]!;
+    current[finalKey] = createHook(definition);
+  }
+
+  return result;
+}
 
 /* -------------------------------------------------------------------------- */
 /*                              CREATE API CLIENT                              */
@@ -208,17 +287,18 @@ export function createApiClient<
   /*                                   QUERIES                                  */
   /* -------------------------------------------------------------------------- */
   const queriesDef = options.queries ?? ({} as Q);
-  const useQueries = {} as {
-    [K in keyof Q]: (
-      options?: UseQueryOptions<Infer<Q[K]["params"]>, Infer<Q[K]["data"]>, Infer<Q[K]["response"]>>
-    ) => QueryResult<Infer<Q[K]["response"]>>;
-  };
+  
+  // Flatten nested queries to dot notation (e.g., "auth.login")
+  const flatQueries = flattenDefinitions<ApiQuery>(queriesDef as any);
+  
+  // Create hooks for each flattened query
+  const flatQueryHooks: Record<string, any> = {};
 
-  for (const key in queriesDef) {
-    const q = queriesDef[key];
+  for (const key in flatQueries) {
+    const q = flatQueries[key];
     if (!q) continue;
 
-    useQueries[key] = (paramsOrOptions?: any) => {
+    flatQueryHooks[key] = (paramsOrOptions?: any) => {
       // Support both direct params and options object
       let queryOptions: UseQueryOptions<any> | undefined;
       if (paramsOrOptions && typeof paramsOrOptions === 'object') {
@@ -398,17 +478,18 @@ export function createApiClient<
   /*                                 MUTATIONS                                  */
   /* -------------------------------------------------------------------------- */
   const mutationsDef = options.mutations ?? ({} as M);
-  const useMutations = {} as {
-    [K in keyof M]: (
-      options?: UseMutationOptions<Infer<M[K]["response"]>>
-    ) => MutationResult<Infer<M[K]["response"]>, Infer<M[K]["data"]>, Infer<M[K]["params"]>>;
-  };
+  
+  // Flatten nested mutations to dot notation (e.g., "auth.login")
+  const flatMutations = flattenDefinitions<ApiMutation>(mutationsDef as any);
+  
+  // Create hooks for each flattened mutation
+  const flatMutationHooks: Record<string, any> = {};
 
-  for (const key in mutationsDef) {
-    const m = mutationsDef[key];
+  for (const key in flatMutations) {
+    const m = flatMutations[key];
     if (!m) continue;
 
-    useMutations[key] = (mutationOptions?: UseMutationOptions) => {
+    flatMutationHooks[key] = (mutationOptions?: UseMutationOptions) => {
       const data = ref<any>();
       const errorMessage = ref<string | undefined>();
       const zodErrors = ref<Omit<$ZodIssue, "input">[] | undefined>();
@@ -561,6 +642,10 @@ export function createApiClient<
   }
 
   /* -------------------------------------------------------------------------- */
+
+  // Rebuild nested structure from flat hooks
+  const useQueries = rebuildNested(flatQueryHooks, (hook) => hook);
+  const useMutations = rebuildNested(flatMutationHooks, (hook) => hook);
 
   return {
     query: useQueries,

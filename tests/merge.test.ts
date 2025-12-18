@@ -112,6 +112,82 @@ describe("mergeQueries", () => {
     expect(merged.getPosts.path).toBe("/posts");
   });
 
+  it("should merge nested query objects", () => {
+    const authQueries = {
+      auth: {
+        me: defineQuery({
+          path: "/auth/me",
+          response: z.object({ id: z.number() }),
+        }),
+        profile: defineQuery({
+          path: "/auth/profile",
+          response: z.object({ email: z.string() }),
+        }),
+      },
+    };
+
+    const userQueries = {
+      users: {
+        list: defineQuery({
+          path: "/users",
+          response: z.array(z.object({ id: z.number() })),
+        }),
+      },
+    };
+
+    const merged = mergeQueries(authQueries, userQueries);
+
+    expect(merged).toHaveProperty("auth");
+    expect(merged).toHaveProperty("users");
+    expect(merged.auth.me.path).toBe("/auth/me");
+    expect(merged.auth.profile.path).toBe("/auth/profile");
+    expect(merged.users.list.path).toBe("/users");
+  });
+
+  it("should merge flat and nested query objects", () => {
+    const flatQueries = {
+      getStatus: defineQuery({
+        path: "/status",
+        response: z.object({ status: z.string() }),
+      }),
+    };
+
+    const nestedQueries = {
+      auth: {
+        me: defineQuery({
+          path: "/auth/me",
+          response: z.object({ id: z.number() }),
+        }),
+      },
+    };
+
+    const merged = mergeQueries(flatQueries, nestedQueries);
+
+    expect(merged).toHaveProperty("getStatus");
+    expect(merged).toHaveProperty("auth");
+    expect(merged.getStatus.path).toBe("/status");
+    expect(merged.auth.me.path).toBe("/auth/me");
+  });
+
+  it("should merge nested objects with same parent key", () => {
+    const queries1 = {
+      auth: {
+        me: defineQuery({ path: "/auth/me" }),
+      },
+    };
+
+    const queries2 = {
+      auth: {
+        profile: defineQuery({ path: "/auth/profile" }),
+      },
+    };
+
+    const merged = mergeQueries(queries1, queries2);
+
+    expect(merged.auth.me.path).toBe("/auth/me");
+    expect(merged.auth.profile.path).toBe("/auth/profile");
+  });
+
   it("should merge multiple query objects with overlapping keys (last one wins)", () => {
     const queries1 = {
       getItem: defineQuery({ path: "/items/1" }),
@@ -175,6 +251,82 @@ describe("mergeMutations", () => {
     expect(merged).toHaveProperty("createPost");
     expect(merged.createUser.path).toBe("/users");
     expect(merged.createPost.path).toBe("/posts");
+  });
+
+  it("should merge nested mutation objects", () => {
+    const authMutations = {
+      auth: {
+        login: defineMutation({
+          method: "POST",
+          path: "/auth/login",
+        }),
+        logout: defineMutation({
+          method: "POST",
+          path: "/auth/logout",
+        }),
+      },
+    };
+
+    const userMutations = {
+      users: {
+        create: defineMutation({
+          method: "POST",
+          path: "/users",
+        }),
+      },
+    };
+
+    const merged = mergeMutations(authMutations, userMutations);
+
+    expect(merged).toHaveProperty("auth");
+    expect(merged).toHaveProperty("users");
+    expect(merged.auth.login.path).toBe("/auth/login");
+    expect(merged.auth.logout.path).toBe("/auth/logout");
+    expect(merged.users.create.path).toBe("/users");
+  });
+
+  it("should merge flat and nested mutation objects", () => {
+    const flatMutations = {
+      ping: defineMutation({
+        method: "POST",
+        path: "/ping",
+      }),
+    };
+
+    const nestedMutations = {
+      auth: {
+        login: defineMutation({
+          method: "POST",
+          path: "/auth/login",
+        }),
+      },
+    };
+
+    const merged = mergeMutations(flatMutations, nestedMutations);
+
+    expect(merged).toHaveProperty("ping");
+    expect(merged).toHaveProperty("auth");
+    expect(merged.ping.path).toBe("/ping");
+    expect(merged.auth.login.path).toBe("/auth/login");
+  });
+
+  it("should merge nested objects with same parent key", () => {
+    const mutations1 = {
+      auth: {
+        login: defineMutation({ method: "POST", path: "/auth/login" }),
+      },
+    };
+
+    const mutations2 = {
+      auth: {
+        logout: defineMutation({ method: "POST", path: "/auth/logout" }),
+      },
+    };
+
+    const merged = mergeMutations(mutations1, mutations2);
+
+    expect(merged.auth.login.path).toBe("/auth/login");
+    expect(merged.auth.logout.path).toBe("/auth/logout");
   });
 
   it("should merge multiple mutation objects with overlapping keys (last one wins)", () => {

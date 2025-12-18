@@ -80,9 +80,17 @@ export interface ApiMutation<
 }
 
 /**
+ * Nested structure type that allows both direct API definitions and nested groups
+ * @template T - Either ApiQuery or ApiMutation
+ */
+export type NestedApiDefinitions<T> = {
+  [K: string]: T | NestedApiDefinitions<T>;
+};
+
+/**
  * Configuration options for creating an API client
- * @template Q - Record of query endpoint definitions
- * @template M - Record of mutation endpoint definitions
+ * @template Q - Record of query endpoint definitions (can be nested)
+ * @template M - Record of mutation endpoint definitions (can be nested)
  * @example
  * const options: ApiClientOptions = {
  *   baseURL: "https://api.example.com",
@@ -93,10 +101,27 @@ export interface ApiMutation<
  *   mutations: { createUser: { method: "POST", path: "/users" } },
  *   onErrorRequest: (error) => console.error(error.message)
  * };
+ * @example
+ * // Nested structure example
+ * const options: ApiClientOptions = {
+ *   baseURL: "https://api.example.com",
+ *   queries: {
+ *     users: {
+ *       list: { path: "/users" },
+ *       get: { path: "/users/{id}", params: z.object({ id: z.number() }) }
+ *     }
+ *   },
+ *   mutations: {
+ *     auth: {
+ *       login: { method: "POST", path: "/auth/login" },
+ *       logout: { method: "POST", path: "/auth/logout" }
+ *     }
+ *   }
+ * };
  */
 export interface ApiClientOptions<
-  Q extends Record<string, ApiQuery> = Record<string, ApiQuery>,
-  M extends Record<string, ApiMutation> = Record<string, ApiMutation>
+  Q extends NestedApiDefinitions<ApiQuery> = NestedApiDefinitions<ApiQuery>,
+  M extends NestedApiDefinitions<ApiMutation> = NestedApiDefinitions<ApiMutation>
 > {
   baseURL: string;
   headers?: Record<string, string>;
