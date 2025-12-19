@@ -10,14 +10,14 @@ import type { $ZodIssue } from "zod/v4/core";
 /* -------------------------------------------------------------------------- */
 
 /**
- * Check if an object is an ApiQuery (has path property but processes separately from mutations)
+ * Type guard to check if an object is an ApiQuery definition
  */
 function isApiQuery(obj: any): obj is ApiQuery {
   return obj && typeof obj === 'object' && obj !== null && typeof obj.path === 'string';
 }
 
 /**
- * Check if an object is an ApiMutation (has both path and method properties)
+ * Type guard to check if an object is an ApiMutation definition
  */
 function isApiMutation(obj: any): obj is ApiMutation {
   return obj && typeof obj === 'object' && obj !== null && typeof obj.path === 'string' && typeof obj.method === 'string';
@@ -228,6 +228,10 @@ export function createApiClient<
   
   /**
    * Recursively create query hooks for nested structures
+   * 
+   * Note: Returns 'any' type intentionally to preserve the dynamic structure.
+   * TypeScript will infer the correct types at usage sites based on the input structure.
+   * This allows for flexible nesting while maintaining type safety where it matters.
    */
   function createQueryHooks(queriesDef: Record<string, any>): any {
     const result: any = {};
@@ -432,6 +436,10 @@ export function createApiClient<
   
   /**
    * Recursively create mutation hooks for nested structures
+   * 
+   * Note: Returns 'any' type intentionally to preserve the dynamic structure.
+   * TypeScript will infer the correct types at usage sites based on the input structure.
+   * This allows for flexible nesting while maintaining type safety where it matters.
    */
   function createMutationHooks(mutationsDef: Record<string, any>): any {
     const result: any = {};
