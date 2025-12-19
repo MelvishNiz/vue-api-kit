@@ -1,3 +1,9 @@
+## [1.10.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.9.0...v1.10.0) (2025-12-19)
+
+### :sparkles: Features
+
+* **release:** only up version ([ec04305](https://github.com/MelvishNiz/vue-api-kit/commit/ec04305ae2d38822c1cd44cb35eb07359bfb280e))
+
 ## [1.9.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.8.1...v1.9.0) (2025-12-19)
 
 ### :sparkles: Features
