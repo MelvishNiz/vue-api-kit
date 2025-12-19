@@ -234,6 +234,7 @@ async function handleSubmit() {
 - ✅ **Auto Loading States**: Built-in loading, error, and success states
 - ✅ **POST Queries**: Support for both GET and POST methods in queries for complex data retrieval
 - ✅ **Modular APIs**: Merge queries and mutations from separate files with full type safety
+- ✅ **Multi-Level Nesting**: Organize queries and mutations in nested structures with full type safety
 - ✅ **File Upload**: Support for multipart/form-data in mutations
 - ✅ **Path Parameters**: Automatic path parameter replacement
 - ✅ **Debouncing**: Built-in request debouncing
@@ -242,6 +243,164 @@ async function handleSubmit() {
 - ✅ **Request Interceptors**: Modify requests before sending
 - ✅ **Fully Typed**: Complete type inference for params, data, and response
 - ✅ **Tree-Shakeable**: Only bundles what you use
+
+## 🏗️ Multi-Level Nested Structure
+
+Organize your API endpoints in a hierarchical structure for better code organization and maintainability.
+
+### Basic Nested Structure
+
+```typescript
+import { createApiClient, defineQuery, defineMutation } from 'vue-api-kit';
+import { z } from 'zod';
+
+const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  
+  queries: {
+    // Organize queries by resource
+    users: {
+      getAll: defineQuery({
+        path: '/users',
+        response: z.array(z.object({
+          id: z.number(),
+          name: z.string()
+        }))
+      }),
+      getById: defineQuery({
+        path: '/users/{id}',
+        params: z.object({ id: z.number() }),
+        response: z.object({
+          id: z.number(),
+          name: z.string()
+        })
+      }),
+      search: defineQuery({
+        method: 'POST',
+        path: '/users/search',
+        data: z.object({ query: z.string() }),
+        response: z.array(z.object({ id: z.number(), name: z.string() }))
+      })
+    },
+    posts: {
+      getAll: defineQuery({
+        path: '/posts',
+        response: z.array(z.object({ id: z.number(), title: z.string() }))
+      }),
+      getById: defineQuery({
+        path: '/posts/{id}',
+        params: z.object({ id: z.number() }),
+        response: z.object({ id: z.number(), title: z.string() })
+      })
+    }
+  },
+  
+  mutations: {
+    users: {
+      create: defineMutation({
+        method: 'POST',
+        path: '/users',
+        data: z.object({ name: z.string(), email: z.string().email() }),
+        response: z.object({ id: z.number(), name: z.string() })
+      }),
+      update: defineMutation({
+        method: 'PUT',
+        path: '/users/{id}',
+        params: z.object({ id: z.number() }),
+        data: z.object({ name: z.string() }),
+        response: z.object({ id: z.number(), name: z.string() })
+      }),
+      delete: defineMutation({
+        method: 'DELETE',
+        path: '/users/{id}',
+        params: z.object({ id: z.number() })
+      })
+    }
+  }
+});
+
+// Usage in components:
+const { result, isLoading } = api.query.users.getAll();
+const { mutate } = api.mutation.users.create();
+```
+
+### Deep Nesting
+
+You can nest as deeply as needed for complex API structures:
+
+```typescript
+const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  
+  queries: {
+    api: {
+      v1: {
+        admin: {
+          users: {
+            list: defineQuery({ path: '/api/v1/admin/users' }),
+            search: defineQuery({ 
+              method: 'POST',
+              path: '/api/v1/admin/users/search' 
+            })
+          },
+          reports: {
+            daily: defineQuery({ path: '/api/v1/admin/reports/daily' }),
+            monthly: defineQuery({ path: '/api/v1/admin/reports/monthly' })
+          }
+        },
+        public: {
+          posts: {
+            list: defineQuery({ path: '/api/v1/public/posts' })
+          }
+        }
+      }
+    }
+  }
+});
+
+// Access deeply nested endpoints:
+api.query.api.v1.admin.users.list()
+api.query.api.v1.admin.reports.daily()
+api.query.api.v1.public.posts.list()
+```
+
+### Mixed Flat and Nested Structure
+
+You can combine flat and nested structures as needed:
+
+```typescript
+const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  
+  queries: {
+    // Flat queries
+    getStatus: defineQuery({ path: '/status' }),
+    getHealth: defineQuery({ path: '/health' }),
+    
+    // Nested queries
+    users: {
+      getAll: defineQuery({ path: '/users' }),
+      getById: defineQuery({ path: '/users/{id}' })
+    },
+    posts: {
+      getAll: defineQuery({ path: '/posts' })
+    }
+  }
+});
+
+// Both flat and nested work together:
+api.query.getStatus()       // Flat
+api.query.users.getAll()    // Nested
+```
+
+### Benefits
+
+- **Better Organization**: Group related endpoints together
+- **Improved Readability**: Clear hierarchical structure reflects your API design
+- **Namespace Separation**: Prevent naming conflicts (e.g., `users.create` vs `posts.create`)
+- **Scalability**: Easy to add new endpoints without cluttering the root level
+- **Type Safety**: Full TypeScript inference throughout the nested structure
+- **Backward Compatible**: Works alongside existing flat structure
 
 ## 🔧 Advanced Configuration
 
@@ -537,6 +696,99 @@ export const api = createApiClient({
 // api.query.getPosts()    ✓ Fully typed
 // api.mutation.createUser ✓ Fully typed
 // api.mutation.createPost ✓ Fully typed
+```
+
+### Nested Structure with Modular APIs
+
+You can also use nested structures with modular API definitions:
+
+**user-api.ts** - User module with nested structure
+```typescript
+import { z, defineQuery, defineMutation } from 'vue-api-kit';
+
+export const userApi = {
+  queries: {
+    users: {
+      getAll: defineQuery({
+        path: '/users',
+        response: z.array(z.object({ id: z.number(), name: z.string() }))
+      }),
+      getById: defineQuery({
+        path: '/users/{id}',
+        params: z.object({ id: z.number() }),
+        response: z.object({ id: z.number(), name: z.string() })
+      })
+    }
+  },
+  mutations: {
+    users: {
+      create: defineMutation({
+        method: 'POST',
+        path: '/users',
+        data: z.object({ name: z.string() })
+      }),
+      update: defineMutation({
+        method: 'PUT',
+        path: '/users/{id}',
+        params: z.object({ id: z.number() }),
+        data: z.object({ name: z.string() })
+      })
+    }
+  }
+};
+```
+
+**post-api.ts** - Post module with nested structure
+```typescript
+import { z, defineQuery, defineMutation } from 'vue-api-kit';
+
+export const postApi = {
+  queries: {
+    posts: {
+      getAll: defineQuery({
+        path: '/posts',
+        response: z.array(z.object({ id: z.number(), title: z.string() }))
+      }),
+      getById: defineQuery({
+        path: '/posts/{id}',
+        params: z.object({ id: z.number() }),
+        response: z.object({ id: z.number(), title: z.string() })
+      })
+    }
+  },
+  mutations: {
+    posts: {
+      create: defineMutation({
+        method: 'POST',
+        path: '/posts',
+        data: z.object({ title: z.string(), content: z.string() })
+      })
+    }
+  }
+};
+```
+
+**api.ts** - Merge nested structures
+```typescript
+import { createApiClient, mergeQueries, mergeMutations } from 'vue-api-kit';
+import { userApi } from './user-api';
+import { postApi } from './post-api';
+
+export const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  
+  // Merge nested queries from modules
+  queries: mergeQueries(userApi.queries, postApi.queries),
+  
+  // Merge nested mutations from modules
+  mutations: mergeMutations(userApi.mutations, postApi.mutations)
+});
+
+// Usage with nested structure:
+api.query.users.getAll()     // ✓ Fully typed
+api.query.posts.getById()    // ✓ Fully typed
+api.mutation.users.create()  // ✓ Fully typed
+api.mutation.posts.create()  // ✓ Fully typed
 ```
 
 ### Benefits of Modular Approach

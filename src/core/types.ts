@@ -80,9 +80,50 @@ export interface ApiMutation<
 }
 
 /**
+ * Recursive type to represent nested query or mutation structure
+ */
+export type NestedStructure<T> = T | { [key: string]: NestedStructure<T> };
+
+/**
+ * Extract query hook function from ApiQuery definition
+ */
+export type QueryHookFromDefinition<Q extends ApiQuery> = (
+  options?: UseQueryOptions<Infer<Q["params"]>, Infer<Q["data"]>, Infer<Q["response"]>>
+) => QueryResult<Infer<Q["response"]>>;
+
+/**
+ * Extract mutation hook function from ApiMutation definition
+ */
+export type MutationHookFromDefinition<M extends ApiMutation> = (
+  options?: UseMutationOptions<Infer<M["response"]>>
+) => MutationResult<Infer<M["response"]>, Infer<M["data"]>, Infer<M["params"]>>;
+
+/**
+ * Recursively transform nested query definitions into query hooks
+ */
+export type QueryHooksFromDefinitions<Q> = {
+  [K in keyof Q]: Q[K] extends ApiQuery
+    ? QueryHookFromDefinition<Q[K]>
+    : Q[K] extends Record<string, NestedStructure<ApiQuery>>
+    ? QueryHooksFromDefinitions<Q[K]>
+    : never;
+};
+
+/**
+ * Recursively transform nested mutation definitions into mutation hooks
+ */
+export type MutationHooksFromDefinitions<M> = {
+  [K in keyof M]: M[K] extends ApiMutation
+    ? MutationHookFromDefinition<M[K]>
+    : M[K] extends Record<string, NestedStructure<ApiMutation>>
+    ? MutationHooksFromDefinitions<M[K]>
+    : never;
+};
+
+/**
  * Configuration options for creating an API client
- * @template Q - Record of query endpoint definitions
- * @template M - Record of mutation endpoint definitions
+ * @template Q - Record of query endpoint definitions (can be nested)
+ * @template M - Record of mutation endpoint definitions (can be nested)
  * @example
  * const options: ApiClientOptions = {
  *   baseURL: "https://api.example.com",
@@ -93,10 +134,21 @@ export interface ApiMutation<
  *   mutations: { createUser: { method: "POST", path: "/users" } },
  *   onErrorRequest: (error) => console.error(error.message)
  * };
+ * @example
+ * // Nested structure
+ * const options: ApiClientOptions = {
+ *   baseURL: "https://api.example.com",
+ *   queries: {
+ *     users: {
+ *       getAll: { path: "/users" },
+ *       getById: { path: "/users/{id}" }
+ *     }
+ *   }
+ * };
  */
 export interface ApiClientOptions<
-  Q extends Record<string, ApiQuery> = Record<string, ApiQuery>,
-  M extends Record<string, ApiMutation> = Record<string, ApiMutation>
+  Q extends Record<string, NestedStructure<ApiQuery>> = Record<string, NestedStructure<ApiQuery>>,
+  M extends Record<string, NestedStructure<ApiMutation>> = Record<string, NestedStructure<ApiMutation>>
 > {
   baseURL: string;
   headers?: Record<string, string>;
