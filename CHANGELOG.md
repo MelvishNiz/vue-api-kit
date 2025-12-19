@@ -1,3 +1,9 @@
+## [1.9.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.8.1...v1.9.0) (2025-12-19)
+
+### :sparkles: Features
+
+* add feature nested mutations and queries ([359c004](https://github.com/MelvishNiz/vue-api-kit/commit/359c004a3996998b6f56bb06b33ae0d3290a93d4))
+
 ## [1.8.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.8.0...v1.8.1) (2025-12-18)
 
 ### :zap: Refactor
