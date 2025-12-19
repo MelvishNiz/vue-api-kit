@@ -104,7 +104,7 @@ export type MutationHookFromDefinition<M extends ApiMutation> = (
 export type QueryHooksFromDefinitions<Q> = {
   [K in keyof Q]: Q[K] extends ApiQuery
     ? QueryHookFromDefinition<Q[K]>
-    : Q[K] extends Record<string, any>
+    : Q[K] extends Record<string, NestedStructure<ApiQuery>>
     ? QueryHooksFromDefinitions<Q[K]>
     : never;
 };
@@ -115,7 +115,7 @@ export type QueryHooksFromDefinitions<Q> = {
 export type MutationHooksFromDefinitions<M> = {
   [K in keyof M]: M[K] extends ApiMutation
     ? MutationHookFromDefinition<M[K]>
-    : M[K] extends Record<string, any>
+    : M[K] extends Record<string, NestedStructure<ApiMutation>>
     ? MutationHooksFromDefinitions<M[K]>
     : never;
 };
