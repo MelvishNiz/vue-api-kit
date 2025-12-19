@@ -2,7 +2,7 @@ import axios, { AxiosError, type AxiosProgressEvent } from "axios";
 import { nextTick, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { ZodError, type ZodType } from "zod";
 import { debounce } from "lodash-es";
-import type { ApiClientOptions, ApiMutation, ApiQuery, Infer, MutationResult, QueryResult, UseMutationOptions, UseQueryOptions } from "./types";
+import type { ApiClientOptions, ApiMutation, ApiQuery, Infer, MutationResult, QueryResult, UseMutationOptions, UseQueryOptions, QueryHooksFromDefinitions, MutationHooksFromDefinitions, NestedStructure } from "./types";
 import type { $ZodIssue } from "zod/v4/core";
 
 /* -------------------------------------------------------------------------- */
@@ -70,9 +70,12 @@ function isApiMutation(obj: any): obj is ApiMutation {
  * const { mutate } = api.mutation.createUser();
  */
 export function createApiClient<
-  Q extends Record<string, any>,
-  M extends Record<string, any>
->(options: ApiClientOptions<Q, M>) {
+  Q extends Record<string, NestedStructure<ApiQuery>>,
+  M extends Record<string, NestedStructure<ApiMutation>>
+>(options: ApiClientOptions<Q, M>): {
+  query: QueryHooksFromDefinitions<Q>;
+  mutation: MutationHooksFromDefinitions<M>;
+} {
   const client = axios.create({
     baseURL: options.baseURL,
     headers: {
@@ -228,13 +231,11 @@ export function createApiClient<
   
   /**
    * Recursively create query hooks for nested structures
-   * 
-   * Note: Returns 'any' type intentionally to preserve the dynamic structure.
-   * TypeScript will infer the correct types at usage sites based on the input structure.
-   * This allows for flexible nesting while maintaining type safety where it matters.
    */
-  function createQueryHooks(queriesDef: Record<string, any>): any {
-    const result: any = {};
+  function createQueryHooks<T extends Record<string, NestedStructure<ApiQuery>>>(
+    queriesDef: T
+  ): QueryHooksFromDefinitions<T> {
+    const result = {} as any;
     
     for (const key in queriesDef) {
       const value = queriesDef[key];
@@ -420,7 +421,7 @@ export function createApiClient<
         };
       } else if (typeof value === 'object') {
         // It's a nested structure, recurse
-        result[key] = createQueryHooks(value as Record<string, any>);
+        result[key] = createQueryHooks(value);
       }
     }
     
@@ -436,13 +437,11 @@ export function createApiClient<
   
   /**
    * Recursively create mutation hooks for nested structures
-   * 
-   * Note: Returns 'any' type intentionally to preserve the dynamic structure.
-   * TypeScript will infer the correct types at usage sites based on the input structure.
-   * This allows for flexible nesting while maintaining type safety where it matters.
    */
-  function createMutationHooks(mutationsDef: Record<string, any>): any {
-    const result: any = {};
+  function createMutationHooks<T extends Record<string, NestedStructure<ApiMutation>>>(
+    mutationsDef: T
+  ): MutationHooksFromDefinitions<T> {
+    const result = {} as any;
     
     for (const key in mutationsDef) {
       const value = mutationsDef[key];
@@ -604,7 +603,7 @@ export function createApiClient<
         };
       } else if (typeof value === 'object') {
         // It's a nested structure, recurse
-        result[key] = createMutationHooks(value as Record<string, any>);
+        result[key] = createMutationHooks(value);
       }
     }
     
