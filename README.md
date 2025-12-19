@@ -256,7 +256,7 @@ import { z } from 'zod';
 
 const api = createApiClient({
   baseURL: 'https://api.example.com',
-  
+
   queries: {
     // Organize queries by resource
     users: {
@@ -294,7 +294,7 @@ const api = createApiClient({
       })
     }
   },
-  
+
   mutations: {
     users: {
       create: defineMutation({
@@ -331,16 +331,16 @@ You can nest as deeply as needed for complex API structures:
 ```typescript
 const api = createApiClient({
   baseURL: 'https://api.example.com',
-  
+
   queries: {
     api: {
       v1: {
         admin: {
           users: {
             list: defineQuery({ path: '/api/v1/admin/users' }),
-            search: defineQuery({ 
+            search: defineQuery({
               method: 'POST',
-              path: '/api/v1/admin/users/search' 
+              path: '/api/v1/admin/users/search'
             })
           },
           reports: {
@@ -371,12 +371,12 @@ You can combine flat and nested structures as needed:
 ```typescript
 const api = createApiClient({
   baseURL: 'https://api.example.com',
-  
+
   queries: {
     // Flat queries
     getStatus: defineQuery({ path: '/status' }),
     getHealth: defineQuery({ path: '/health' }),
-    
+
     // Nested queries
     users: {
       getAll: defineQuery({ path: '/users' }),
@@ -776,10 +776,10 @@ import { postApi } from './post-api';
 
 export const api = createApiClient({
   baseURL: 'https://api.example.com',
-  
+
   // Merge nested queries from modules
   queries: mergeQueries(userApi.queries, postApi.queries),
-  
+
   // Merge nested mutations from modules
   mutations: mergeMutations(userApi.mutations, postApi.mutations)
 });
@@ -934,3 +934,4 @@ MIT
 ## 👤 Author
 
 MelvishNiz - [GitHub](https://github.com/MelvishNiz)
+
