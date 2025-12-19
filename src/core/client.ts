@@ -10,17 +10,17 @@ import type { $ZodIssue } from "zod/v4/core";
 /* -------------------------------------------------------------------------- */
 
 /**
- * Check if an object is an ApiQuery (has path property)
+ * Check if an object is an ApiQuery (has path property but processes separately from mutations)
  */
 function isApiQuery(obj: any): obj is ApiQuery {
-  return obj && typeof obj === 'object' && 'path' in obj;
+  return obj && typeof obj === 'object' && obj !== null && typeof obj.path === 'string';
 }
 
 /**
- * Check if an object is an ApiMutation (has path and method properties)
+ * Check if an object is an ApiMutation (has both path and method properties)
  */
 function isApiMutation(obj: any): obj is ApiMutation {
-  return obj && typeof obj === 'object' && 'path' in obj && 'method' in obj;
+  return obj && typeof obj === 'object' && obj !== null && typeof obj.path === 'string' && typeof obj.method === 'string';
 }
 
 /* -------------------------------------------------------------------------- */
