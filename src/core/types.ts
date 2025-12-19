@@ -81,8 +81,8 @@ export interface ApiMutation<
 
 /**
  * Configuration options for creating an API client
- * @template Q - Record of query endpoint definitions
- * @template M - Record of mutation endpoint definitions
+ * @template Q - Record of query endpoint definitions (can be nested)
+ * @template M - Record of mutation endpoint definitions (can be nested)
  * @example
  * const options: ApiClientOptions = {
  *   baseURL: "https://api.example.com",
@@ -93,10 +93,21 @@ export interface ApiMutation<
  *   mutations: { createUser: { method: "POST", path: "/users" } },
  *   onErrorRequest: (error) => console.error(error.message)
  * };
+ * @example
+ * // Nested structure
+ * const options: ApiClientOptions = {
+ *   baseURL: "https://api.example.com",
+ *   queries: {
+ *     users: {
+ *       getAll: { path: "/users" },
+ *       getById: { path: "/users/{id}" }
+ *     }
+ *   }
+ * };
  */
 export interface ApiClientOptions<
-  Q extends Record<string, ApiQuery> = Record<string, ApiQuery>,
-  M extends Record<string, ApiMutation> = Record<string, ApiMutation>
+  Q extends Record<string, any> = Record<string, any>,
+  M extends Record<string, any> = Record<string, any>
 > {
   baseURL: string;
   headers?: Record<string, string>;
