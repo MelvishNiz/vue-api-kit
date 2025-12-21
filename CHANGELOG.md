@@ -1,3 +1,9 @@
+## [1.10.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.0...v1.10.1) (2025-12-21)
+
+### :bug: Fixes
+
+* add url parameter to onErrorRequest for better error handling ([67ddda5](https://github.com/MelvishNiz/vue-api-kit/commit/67ddda5a8d21f6985361a05b5bbbad66d7b69664))
+
 ## [1.10.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.9.0...v1.10.0) (2025-12-19)
 
 ### :sparkles: Features
