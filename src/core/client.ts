@@ -2,7 +2,7 @@ import axios, { AxiosError, type AxiosProgressEvent } from "axios";
 import { nextTick, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { ZodError, type ZodType } from "zod";
 import { debounce } from "lodash-es";
-import type { ApiClientOptions, ApiMutation, ApiQuery, Infer, MutationResult, QueryResult, UseMutationOptions, UseQueryOptions, QueryHooksFromDefinitions, MutationHooksFromDefinitions, NestedStructure } from "./types";
+import type { ApiClientOptions, ApiMutation, ApiQuery, Infer, UseMutationOptions, UseQueryOptions, QueryHooksFromDefinitions, MutationHooksFromDefinitions, NestedStructure } from "./types";
 import type { $ZodIssue } from "zod/v4/core";
 
 /* -------------------------------------------------------------------------- */
@@ -228,7 +228,7 @@ export function createApiClient<
   /* -------------------------------------------------------------------------- */
   /*                                   QUERIES                                  */
   /* -------------------------------------------------------------------------- */
-  
+
   /**
    * Recursively create query hooks for nested structures
    */
@@ -236,15 +236,15 @@ export function createApiClient<
     queriesDef: T
   ): QueryHooksFromDefinitions<T> {
     const result = {} as any;
-    
+
     for (const key in queriesDef) {
       const value = queriesDef[key];
       if (!value) continue;
-      
+
       // Check if it's an ApiQuery or a nested structure
       if (isApiQuery(value)) {
         const q = value as ApiQuery;
-        
+
         result[key] = (paramsOrOptions?: any) => {
           // Support both direct params and options object
           let queryOptions: UseQueryOptions<any> | undefined;
@@ -339,6 +339,7 @@ export function createApiClient<
             } catch (err: any) {
               if (err instanceof AxiosError) {
                 if (err.code !== "ERR_CANCELED") {
+                  const url = err.config?.url;
                   const message = err.response?.data?.message || err.message || "An error occurred";
                   const status = err.response?.status;
                   const code = err.code;
@@ -349,7 +350,7 @@ export function createApiClient<
                   queryOptions?.onError?.(err);
 
                   // Call global error handler
-                  options.onErrorRequest?.({ message, status, code, data });
+                  options.onErrorRequest?.({ message, status, code, data, url });
                 }
               } else if (err instanceof ZodError) {
                 // Handle Zod validation errors
@@ -424,17 +425,17 @@ export function createApiClient<
         result[key] = createQueryHooks(value);
       }
     }
-    
+
     return result;
   }
-  
+
   const queriesDef = options.queries ?? ({} as Q);
   const useQueries = createQueryHooks(queriesDef);
 
   /* -------------------------------------------------------------------------- */
   /*                                 MUTATIONS                                  */
   /* -------------------------------------------------------------------------- */
-  
+
   /**
    * Recursively create mutation hooks for nested structures
    */
@@ -442,15 +443,15 @@ export function createApiClient<
     mutationsDef: T
   ): MutationHooksFromDefinitions<T> {
     const result = {} as any;
-    
+
     for (const key in mutationsDef) {
       const value = mutationsDef[key];
       if (!value) continue;
-      
+
       // Check if it's an ApiMutation or a nested structure
       if (isApiMutation(value)) {
         const m = value as ApiMutation;
-        
+
         result[key] = (mutationOptions?: UseMutationOptions) => {
           const data = ref<any>();
           const errorMessage = ref<string | undefined>();
@@ -606,10 +607,10 @@ export function createApiClient<
         result[key] = createMutationHooks(value);
       }
     }
-    
+
     return result;
   }
-  
+
   const mutationsDef = options.mutations ?? ({} as M);
   const useMutations = createMutationHooks(mutationsDef);
 

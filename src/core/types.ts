@@ -160,7 +160,7 @@ export interface ApiClientOptions<
   onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
   onStartRequest?: () => Promise<void> | void | any;
   onFinishRequest?: () => Promise<void> | void | any;
-  onErrorRequest?: (error: { message: string; status?: number; code?: string, data?: any }) => void;
+  onErrorRequest?: (error: { message: string; status?: number; code?: string, data?: any, url?: string }) => void;
   onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
 }
 
