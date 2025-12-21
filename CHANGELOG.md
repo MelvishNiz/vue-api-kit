@@ -1,3 +1,9 @@
+## [1.10.3](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.2...v1.10.3) (2025-12-21)
+
+### :bug: Fixes
+
+* add params option check in createApiClient for enhanced flexibility ([daeea44](https://github.com/MelvishNiz/vue-api-kit/commit/daeea4446036e6dd3af6717e2bdb464826dc9545))
+
 ## [1.10.2](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.1...v1.10.2) (2025-12-21)
 
 ### :bug: Fixes
