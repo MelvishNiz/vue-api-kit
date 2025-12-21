@@ -1,3 +1,9 @@
+## [1.10.4](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.3...v1.10.4) (2025-12-21)
+
+### :bug: Fixes
+
+* set immediate option to false in createApiClient for consistent behavior ([5bae76f](https://github.com/MelvishNiz/vue-api-kit/commit/5bae76f482c4f1e96ad0caf5bf1eb4f14695997c))
+
 ## [1.10.3](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.2...v1.10.3) (2025-12-21)
 
 ### :bug: Fixes
