@@ -256,6 +256,7 @@ export function createApiClient<
                                     'onError' in paramsOrOptions ||
                                     'onZodError' in paramsOrOptions ||
                                     'onBeforeRequest' in paramsOrOptions ||
+                                    'params' in paramsOrOptions ||
                                     'data' in paramsOrOptions;
             if (hasOptionsProps) {
               queryOptions = paramsOrOptions;
