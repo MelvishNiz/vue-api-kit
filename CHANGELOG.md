@@ -1,3 +1,9 @@
+## [1.10.2](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.1...v1.10.2) (2025-12-21)
+
+### :bug: Fixes
+
+* update immediate option in createApiClient to respect loadOnMount setting ([6f7df33](https://github.com/MelvishNiz/vue-api-kit/commit/6f7df3352ddf0b624393e99bb761f06647b8e096))
+
 ## [1.10.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.0...v1.10.1) (2025-12-21)
 
 ### :bug: Fixes
