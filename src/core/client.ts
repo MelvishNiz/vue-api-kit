@@ -401,7 +401,7 @@ export function createApiClient<
                 () => {
                   debouncedRefetch();
                 },
-                { immediate: queryOptions?.loadOnMount !== false }
+                { immediate: false }
               );
             });
             onBeforeUnmount(() => {
