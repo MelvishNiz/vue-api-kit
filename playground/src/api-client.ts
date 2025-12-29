@@ -15,11 +15,9 @@ export const useApi = createApiClient({
   onFinishRequest: async () => {
     console.log("Request finished");
   },
-  onErrorRequest({message, status, code, response}) {
+  onError({err, message}) {
+    console.log("err", err);
     console.log("message", message);
-    console.log("status", status);
-    console.log("code", code);
-    console.log("response", response);
   },
   queries: {
     posts: {

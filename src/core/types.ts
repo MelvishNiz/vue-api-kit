@@ -160,7 +160,7 @@ export interface ApiClientOptions<
   onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
   onStartRequest?: () => Promise<void> | void | any;
   onFinishRequest?: () => Promise<void> | void | any;
-  onErrorRequest?: (error: { err: AxiosError | ZodError | Error, message: string; status?: number; code?: string, response?: any, url?: string }) => void;
+  onError?: (error: { err: AxiosError | ZodError | Error, message: string; }) => void;
   onZodError?: (zodError: $ZodFlattenedError<any, any>) => void;
 }
 

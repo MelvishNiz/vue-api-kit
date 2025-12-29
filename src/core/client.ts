@@ -344,18 +344,14 @@ export function createApiClient<
             } catch (err: any) {
               if (err instanceof AxiosError) {
                 if (err.code !== "ERR_CANCELED") {
-                  const url = err.config?.url;
                   const message = err.response?.data?.message || err.message || "An error occurred";
-                  const status = err.response?.status;
-                  const code = err.code;
-                  const response = err.response;
                   errorMessage.value = message;
 
                   // Call local error handler
                   queryOptions?.onError?.(err);
 
                   // Call global error handler
-                  options.onErrorRequest?.({ err, message, status, code, response, url });
+                  options.onError?.({ err, message });
                 }
               } else if (err instanceof ZodError) {
                 // Handle Zod validation errors
@@ -371,7 +367,7 @@ export function createApiClient<
                 queryOptions?.onZodError?.(z.flattenError(err));
 
                 // Call global error handler
-                options.onErrorRequest?.({ err, message, code: 'VALIDATION_ERROR' });
+                options.onError?.({ err, message });
 
                 // Call global Zod error handler
                 if (options.onZodError) {
@@ -381,7 +377,7 @@ export function createApiClient<
                 const message = err.message || "An error occurred";
                 errorMessage.value = message;
                 queryOptions?.onError?.(message);
-                options.onErrorRequest?.({ err, message });
+                options.onError?.({ err, message });
               }
             } finally {
               isLoading.value = false;
@@ -564,15 +560,13 @@ export function createApiClient<
             } catch (err: any) {
               if (err instanceof AxiosError) {
                 const message = err.response?.data?.message || err.message || "An error occurred";
-                const status = err.response?.status;
-                const code = err.code;
                 errorMessage.value = message;
 
                 // Call local error handler
                 mutationOptions?.onError?.(err);
 
                 // Call global error handler
-                options.onErrorRequest?.({ err, message, status, code });
+                options.onError?.({ err, message });
               } else if (err instanceof ZodError) {
                 // Handle Zod validation errors
                 zodError.value = z.flattenError(err);
@@ -587,7 +581,7 @@ export function createApiClient<
                 mutationOptions?.onZodError?.(z.flattenError(err));
 
                 // Call global error handler
-                options.onErrorRequest?.({ err, message, code: 'VALIDATION_ERROR' });
+                options.onError?.({ err, message });
 
                 // Call global Zod error handler
                 if (options.onZodError) {
@@ -597,7 +591,7 @@ export function createApiClient<
                 const message = err.message || "An error occurred";
                 errorMessage.value = message;
                 mutationOptions?.onError?.(err);
-                options.onErrorRequest?.({ err,message });
+                options.onError?.({ err, message });
               }
             } finally {
               isLoading.value = false;
