@@ -7,7 +7,7 @@ const params = reactive<{
 }>({
   id: 1
 })
-const { result: post, isLoading, errorMessage, refetch } = useApi.query.post({
+const { result: post, isLoading, errorMessage, zodError, refetch } = useApi.query.post({
   params,
   loadOnMount: true,
   debounce: 300,
@@ -73,6 +73,11 @@ const decrementPostId = () => {
     <div v-if="isLoading" class="flex items-center justify-center py-12">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
     </div>
+
+    <!-- <div v-else-if="zodError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+      <p class="font-medium">Error Validations</p>
+      <p class="text-sm mt-1">{{ zodError }}</p>
+    </div> -->
 
     <div v-else-if="errorMessage" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
       <p class="font-medium">Error loading post</p>

@@ -6,7 +6,7 @@ const title = ref('');
 const body = ref('');
 const userId = ref(1);
 
-const { result, isLoading, errorMessage, mutate } = useApi.mutation.createPost({
+const { result, isLoading, errorMessage, zodError, mutate } = useApi.mutation.createPost({
   onResult: (data) => {
     console.log('Post created:', data);
     // Reset form
@@ -14,19 +14,15 @@ const { result, isLoading, errorMessage, mutate } = useApi.mutation.createPost({
     body.value = '';
     userId.value = 1;
   },
-  onZodError(issues) {
-    console.log(issues[0]?.message);
-  },
+  // onZodError(issues) {
+  //   console.log(issues[0]?.message);
+  // },
   onError: (error) => {
     console.error('Error creating post:', error);
   }
 });
 
 const handleSubmit = () => {
-  if (!title.value || !body.value) {
-    return;
-  }
-
   mutate({
     data: {
       title: title.value,
@@ -40,7 +36,7 @@ const handleSubmit = () => {
 <template>
   <div class="bg-white rounded-lg shadow-md p-6">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Create New Post</h2>
-
+    {{ zodError }}
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <div>
         <label class="block text-gray-700 font-medium mb-2">Title</label>
@@ -48,9 +44,9 @@ const handleSubmit = () => {
           v-model="title"
           type="text"
           placeholder="Enter post title"
-          required
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <p v-if="zodError && 'title' in zodError.fieldErrors">{{ zodError.fieldErrors.title?.[0] }}</p>
       </div>
 
       <div>
@@ -58,7 +54,6 @@ const handleSubmit = () => {
         <textarea
           v-model="body"
           placeholder="Enter post content"
-          required
           rows="4"
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         ></textarea>
@@ -77,7 +72,6 @@ const handleSubmit = () => {
 
       <button
         type="submit"
-        :disabled="isLoading || !title || !body"
         class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
       >
         {{ isLoading ? 'Creating...' : 'Create Post' }}

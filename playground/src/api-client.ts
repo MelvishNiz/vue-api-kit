@@ -15,11 +15,11 @@ export const useApi = createApiClient({
   onFinishRequest: async () => {
     console.log("Request finished");
   },
-  onErrorRequest({message, status, code, data}) {
+  onErrorRequest({message, status, code, response}) {
     console.log("message", message);
     console.log("status", status);
     console.log("code", code);
-    console.log("data", data);
+    console.log("response", response);
   },
   queries: {
     posts: {
@@ -36,7 +36,7 @@ export const useApi = createApiClient({
       method: "GET",
       path: "/posts/{id}",
       params: z.object({
-        id: z.number(),
+        id: z.number().max(100, "ID must be less than or equal to 100"),
       }),
       response: z.object({
         userId: z.number(),
@@ -81,8 +81,8 @@ export const useApi = createApiClient({
       method: "POST",
       path: "/posts",
       data: z.object({
-        title: z.string(),
-        body: z.string(),
+        title: z.string().min(5, "Title must be at least 5 characters long"),
+        body: z.string().min(10, "Body must be at least 10 characters long"),
         userId: z.number(),
       }),
       response: z.object({

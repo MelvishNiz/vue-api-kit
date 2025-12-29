@@ -1,7 +1,7 @@
 import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 import type { Ref } from "vue";
 import type { ZodError, ZodType } from "zod";
-import type { $ZodIssue } from "zod/v4/core";
+import type { $ZodFlattenedError } from "zod/v4/core";
 
 /**
  * HTTP methods supported by the API client
@@ -160,8 +160,8 @@ export interface ApiClientOptions<
   onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
   onStartRequest?: () => Promise<void> | void | any;
   onFinishRequest?: () => Promise<void> | void | any;
-  onErrorRequest?: (error: { message: string; status?: number; code?: string, data?: any, url?: string }) => void;
-  onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
+  onErrorRequest?: (error: { err: AxiosError | ZodError | Error, message: string; status?: number; code?: string, response?: any, url?: string }) => void;
+  onZodError?: (zodError: $ZodFlattenedError<any, any>) => void;
 }
 
 /**
@@ -191,7 +191,7 @@ export interface UseQueryOptions<TParams = any, TData = any, TResult = any> {
   debounce?: number;
   onResult?: (result: TResult) => void;
   onError?: (error: AxiosError | ZodError | Error) => void;
-  onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
+  onZodError?: (zodError: $ZodFlattenedError<any, any>) => void;
   onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
 }
 
@@ -208,7 +208,7 @@ export interface UseQueryOptions<TParams = any, TData = any, TResult = any> {
 export interface UseMutationOptions<TResult = any> {
   onResult?: (result: TResult) => void;
   onError?: (error: AxiosError | ZodError | Error) => void;
-  onZodError?: (issues: Omit<$ZodIssue, "input">[]) => void;
+  onZodError?: (zodError: $ZodFlattenedError<any, any>) => void;
   onUploadProgress?: (progress: number) => void;
   onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
 }
@@ -227,7 +227,7 @@ export interface UseMutationOptions<TResult = any> {
 export interface QueryResult<TResult> {
   result: Ref<TResult | undefined>;
   errorMessage: Ref<string | undefined>;
-  zodErrors: Ref<Omit<$ZodIssue, "input">[] | undefined>;
+  zodError: Ref<$ZodFlattenedError<any, any> | undefined>;
   isLoading: Ref<boolean>;
   isDone: Ref<boolean>;
   refetch: () => Promise<void>;
@@ -248,7 +248,7 @@ export interface QueryResult<TResult> {
 export interface MutationResult<TResult, TData = any, TParams = any> {
   result: Ref<TResult | undefined>;
   errorMessage: Ref<string | undefined>;
-  zodErrors: Ref<Omit<$ZodIssue, "input">[] | undefined>;
+  zodError: Ref<$ZodFlattenedError<any, any> | undefined>;
   isLoading: Ref<boolean>;
   isDone: Ref<boolean>;
   uploadProgress: Ref<number>;

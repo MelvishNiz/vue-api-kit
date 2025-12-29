@@ -1,9 +1,9 @@
 import axios, { AxiosError, type AxiosProgressEvent } from "axios";
 import { nextTick, ref, watch, onMounted, onBeforeUnmount } from "vue";
-import { ZodError, type ZodType } from "zod";
+import z, { ZodError, type ZodType } from "zod";
 import { debounce } from "lodash-es";
 import type { ApiClientOptions, ApiMutation, ApiQuery, Infer, UseMutationOptions, UseQueryOptions, QueryHooksFromDefinitions, MutationHooksFromDefinitions, NestedStructure } from "./types";
-import type { $ZodIssue } from "zod/v4/core";
+import type { $ZodFlattenedError } from "zod/v4/core";
 
 /* -------------------------------------------------------------------------- */
 /*                              HELPER FUNCTIONS                              */
@@ -268,7 +268,7 @@ export function createApiClient<
 
           const data = ref<any>();
           const errorMessage = ref<string | undefined>();
-          const zodErrors = ref<Omit<$ZodIssue, "input">[] | undefined>();
+          const zodError = ref<$ZodFlattenedError<any, any> | undefined>();
           const isLoading = ref(false);
           const isDone = ref(false);
           const isFirstLoad = ref(true);
@@ -329,6 +329,10 @@ export function createApiClient<
                 }
               }
 
+              // Reset Error state on success
+              errorMessage.value = undefined;
+              zodError.value = undefined;
+
               const res = await client.request(requestConfig);
 
               const parsedData = q.response
@@ -344,42 +348,40 @@ export function createApiClient<
                   const message = err.response?.data?.message || err.message || "An error occurred";
                   const status = err.response?.status;
                   const code = err.code;
-                  const data = err.response?.data;
+                  const response = err.response;
                   errorMessage.value = message;
 
                   // Call local error handler
                   queryOptions?.onError?.(err);
 
                   // Call global error handler
-                  options.onErrorRequest?.({ message, status, code, data, url });
+                  options.onErrorRequest?.({ err, message, status, code, response, url });
                 }
               } else if (err instanceof ZodError) {
                 // Handle Zod validation errors
-                zodErrors.value = err.issues || [];
-                const validationMessages = zodErrors.value.map((e: any) =>
-                  `${e.path.join('.')}: ${e.message}`
-                ).join(', ');
-                const message = `Validation error: ${validationMessages}`;
+                zodError.value = z.flattenError(err);
+                const length = Object.keys(zodError.value.fieldErrors).length;
+                const message = `${Object.values(zodError.value.fieldErrors).at(0)}.${length > 1 ? ` (and ${length - 1} more errors)` : ''}`;
                 errorMessage.value = message;
 
                 // Call local error handler with formatted validation errors
                 queryOptions?.onError?.(err);
 
                 // Call local Zod error handler
-                queryOptions?.onZodError?.(zodErrors.value);
+                queryOptions?.onZodError?.(z.flattenError(err));
 
                 // Call global error handler
-                options.onErrorRequest?.({ message, code: 'VALIDATION_ERROR' });
+                options.onErrorRequest?.({ err, message, code: 'VALIDATION_ERROR' });
 
                 // Call global Zod error handler
                 if (options.onZodError) {
-                  options.onZodError(zodErrors.value);
+                  options.onZodError(z.flattenError(err));
                 }
               } else {
                 const message = err.message || "An error occurred";
                 errorMessage.value = message;
                 queryOptions?.onError?.(message);
-                options.onErrorRequest?.({ message });
+                options.onErrorRequest?.({ err, message });
               }
             } finally {
               isLoading.value = false;
@@ -419,7 +421,7 @@ export function createApiClient<
             }
           }
 
-          return { result: data, errorMessage, zodErrors, isLoading, isDone, refetch };
+          return { result: data, errorMessage, zodError, isLoading, isDone, refetch };
         };
       } else if (typeof value === 'object') {
         // It's a nested structure, recurse
@@ -456,7 +458,7 @@ export function createApiClient<
         result[key] = (mutationOptions?: UseMutationOptions) => {
           const data = ref<any>();
           const errorMessage = ref<string | undefined>();
-          const zodErrors = ref<Omit<$ZodIssue, "input">[] | undefined>();
+          const zodError = ref<$ZodFlattenedError<any, any> | undefined>();
           const isLoading = ref(false);
           const isDone = ref(false);
           const uploadProgress = ref(0);
@@ -547,6 +549,10 @@ export function createApiClient<
                 }
               }
 
+              // Reset Error state on success
+              errorMessage.value = undefined;
+              zodError.value = undefined;
+
               const res = await client.request(requestConfig);
 
               const parsedData = m.response
@@ -566,34 +572,32 @@ export function createApiClient<
                 mutationOptions?.onError?.(err);
 
                 // Call global error handler
-                options.onErrorRequest?.({ message, status, code });
+                options.onErrorRequest?.({ err, message, status, code });
               } else if (err instanceof ZodError) {
                 // Handle Zod validation errors
-                zodErrors.value = err.issues || [];
-                const validationMessages = zodErrors.value.map((e: any) =>
-                  `${e.path.join('.')}: ${e.message}`
-                ).join(', ');
-                const message = `Validation error: ${validationMessages}`;
+                zodError.value = z.flattenError(err);
+                const length = Object.keys(zodError.value.fieldErrors).length;
+                const message = `${Object.values(zodError.value.fieldErrors).at(0)}.${length > 1 ? ` (and ${length - 1} more errors)` : ''}`;
                 errorMessage.value = message;
 
                 // Call local error handler with formatted validation errors
                 mutationOptions?.onError?.(err);
 
                 // Call local Zod error handler
-                mutationOptions?.onZodError?.(zodErrors.value);
+                mutationOptions?.onZodError?.(z.flattenError(err));
 
                 // Call global error handler
-                options.onErrorRequest?.({ message, code: 'VALIDATION_ERROR' });
+                options.onErrorRequest?.({ err, message, code: 'VALIDATION_ERROR' });
 
                 // Call global Zod error handler
                 if (options.onZodError) {
-                  options.onZodError(zodErrors.value);
+                  options.onZodError(z.flattenError(err));
                 }
               } else {
                 const message = err.message || "An error occurred";
                 errorMessage.value = message;
                 mutationOptions?.onError?.(err);
-                options.onErrorRequest?.({ message });
+                options.onErrorRequest?.({ err,message });
               }
             } finally {
               isLoading.value = false;
@@ -601,7 +605,7 @@ export function createApiClient<
             }
           };
 
-          return { result: data, errorMessage, zodErrors, isLoading, isDone, uploadProgress, mutate };
+          return { result: data, errorMessage, zodError, isLoading, isDone, uploadProgress, mutate };
         };
       } else if (typeof value === 'object') {
         // It's a nested structure, recurse
