@@ -1,3 +1,9 @@
+## [1.10.6](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.5...v1.10.6) (2025-12-29)
+
+### :zap: Refactor
+
+* simplify error handling by updating onErrorRequest to onError in API client ([cbb4541](https://github.com/MelvishNiz/vue-api-kit/commit/cbb4541c9440bfe9dee0efde3f351db851ec9658))
+
 ## [1.10.5](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.4...v1.10.5) (2025-12-29)
 
 ### :bug: Fixes
