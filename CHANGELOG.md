@@ -1,3 +1,9 @@
+## [1.10.7](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.6...v1.10.7) (2025-12-29)
+
+### :bug: Fixes
+
+* change ZodError export from type to named export in index.ts ([f731975](https://github.com/MelvishNiz/vue-api-kit/commit/f7319750a8a2176b0d6ec5dacb9a2c036cd3daf8))
+
 ## [1.10.6](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.5...v1.10.6) (2025-12-29)
 
 ### :zap: Refactor
