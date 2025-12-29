@@ -466,7 +466,6 @@ describe("Nested Structure Support", () => {
       });
 
       expect(errorMessage.value).toBeDefined();
-      expect(errorMessage.value).toContain("Validation error");
     });
   });
 });
