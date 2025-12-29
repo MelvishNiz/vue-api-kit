@@ -1,3 +1,13 @@
+## [1.10.5](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.4...v1.10.5) (2025-12-29)
+
+### :bug: Fixes
+
+* remove redundant validation error check in nested structure tests ([96562ab](https://github.com/MelvishNiz/vue-api-kit/commit/96562ab5c3be067c70652ff9c0a6259067298d6e))
+
+### :zap: Refactor
+
+* update error handling and validation in API client and components ([3b2bf71](https://github.com/MelvishNiz/vue-api-kit/commit/3b2bf716c74650da15e967b91b167f6572136d73))
+
 ## [1.10.4](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.3...v1.10.4) (2025-12-21)
 
 ### :bug: Fixes
