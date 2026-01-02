@@ -33,6 +33,11 @@ function isApiMutation(obj: any): obj is ApiMutation {
  * Output: FormData with "image[file]" and "image[url]"
  */
 function appendToFormData(formData: FormData, data: any, parentKey: string = ''): void {
+  // Skip undefined values - they should not be included in FormData
+  if (data === undefined) {
+    return;
+  }
+  
   if (data instanceof File || data instanceof Blob) {
     formData.append(parentKey, data);
   } else if (Array.isArray(data)) {
@@ -42,7 +47,8 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
       } else if (typeof item === 'object' && item !== null) {
         // For nested objects in arrays, we still use bracket notation
         appendToFormData(formData, item, parentKey);
-      } else {
+      } else if (item !== undefined) {
+        // Skip undefined items in arrays
         formData.append(parentKey, String(item));
       }
     });
@@ -53,7 +59,7 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
       appendToFormData(formData, value, formKey);
     }
   } else {
-    // Primitive values (string, number, boolean, null, undefined)
+    // Primitive values (string, number, boolean, null)
     formData.append(parentKey, String(data));
   }
 }
