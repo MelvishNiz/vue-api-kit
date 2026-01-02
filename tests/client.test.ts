@@ -465,7 +465,7 @@ describe("createApiClient", () => {
     const onBeforeRequest = vi.fn();
     const onStartRequest = vi.fn();
     const onFinishRequest = vi.fn();
-    const onErrorRequest = vi.fn();
+    const onError = vi.fn();
     const onZodError = vi.fn();
 
     createApiClient({
@@ -473,7 +473,7 @@ describe("createApiClient", () => {
       onBeforeRequest,
       onStartRequest,
       onFinishRequest,
-      onErrorRequest,
+      onError,
       onZodError,
       queries: {},
     });

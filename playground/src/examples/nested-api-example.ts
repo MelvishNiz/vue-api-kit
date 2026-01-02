@@ -33,7 +33,7 @@ const CommentSchema = z.object({
 // Create API client with nested structure
 export const nestedApi = createApiClient({
   baseURL: 'https://jsonplaceholder.typicode.com',
-  
+
   // Nested query structure
   queries: {
     // Users resource
@@ -59,7 +59,7 @@ export const nestedApi = createApiClient({
         response: UserSchema,
       }),
     },
-    
+
     // Posts resource
     posts: {
       getAll: defineQuery({
@@ -80,7 +80,7 @@ export const nestedApi = createApiClient({
         response: z.array(PostSchema),
       }),
     },
-    
+
     // Comments resource
     comments: {
       getAll: defineQuery({
@@ -96,7 +96,7 @@ export const nestedApi = createApiClient({
       }),
     },
   },
-  
+
   // Nested mutation structure
   mutations: {
     users: {
@@ -126,7 +126,7 @@ export const nestedApi = createApiClient({
         params: z.object({ id: z.number() }),
       }),
     },
-    
+
     posts: {
       create: defineMutation({
         method: 'POST',
@@ -154,7 +154,7 @@ export const nestedApi = createApiClient({
         params: z.object({ id: z.number() }),
       }),
     },
-    
+
     comments: {
       create: defineMutation({
         method: 'POST',
@@ -169,17 +169,17 @@ export const nestedApi = createApiClient({
       }),
     },
   },
-  
+
   // Global error handler
-  onErrorRequest: ({ message, status }) => {
-    console.error(`[Nested API Error] ${status}: ${message}`);
+  onError: ({ message }) => {
+    console.error(`[Nested API Error] ${message}`);
   },
 });
 
 // Example: Deep nesting for versioned API
 export const deepNestedApi = createApiClient({
   baseURL: 'https://jsonplaceholder.typicode.com',
-  
+
   queries: {
     api: {
       v1: {

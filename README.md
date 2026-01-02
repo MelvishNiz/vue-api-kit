@@ -434,7 +434,7 @@ const api = createApiClient({
     console.log('Request finished');
   },
 
-  onErrorRequest: (error) => {
+  onError: (error) => {
     // Global error handler
     console.error('API Error:', error.message);
   },
@@ -856,7 +856,7 @@ const api = createApiClient({
 const { mutate } = api.mutation.createProduct();
 
 async function handleSubmit(file: File) {
-  await mutate({ 
+  await mutate({
     data: {
       code: 'PROD001',
       name: 'Product Name',
@@ -881,7 +881,7 @@ async function handleSubmit(file: File) {
 You can also use flat bracket notation directly:
 
 ```typescript
-await mutate({ 
+await mutate({
   data: {
     'image[file]': file,
     'image[file_url]': 'https://example.com/existing.jpg',
