@@ -1,3 +1,14 @@
+## [1.10.9](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.8...v1.10.9) (2026-01-02)
+
+### :bug: Fixes
+
+* skip undefined values in multipart FormData ([eed9b0c](https://github.com/MelvishNiz/vue-api-kit/commit/eed9b0cda3ad8ae876ff38765807a657da2a7ea9))
+
+### :memo: Documentation
+
+* improve code examples clarity by removing ellipsis placeholders ([fe6fb49](https://github.com/MelvishNiz/vue-api-kit/commit/fe6fb49ce4dbd41870a268104cacf62b13882a06))
+* simplify and restructure README for better readability ([07a75d9](https://github.com/MelvishNiz/vue-api-kit/commit/07a75d98ad23fbfd3ed7a4973e95ded334f95930))
+
 ## [1.10.8](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.7...v1.10.8) (2026-01-02)
 
 ### :bug: Fixes
