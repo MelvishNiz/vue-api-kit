@@ -126,23 +126,23 @@ async function handleCreate() {
 
 ### Queries (GET)
 
-Queries automatically load data on component mount:
+Use queries to fetch data. They automatically load on component mount:
 
 ```vue
 <script setup lang="ts">
 import { api } from './api';
 import { ref } from 'vue';
 
-// Simple query
+// Simple query - automatically loads data on mount
 const { result, isLoading, errorMessage } = api.query.getUsers();
 
-// Query with parameters
+// Query with parameters - reactive to parameter changes
 const userId = ref(1);
 const { result: user, refetch } = api.query.getUser({
   params: { id: userId }
 });
 
-// Query with options
+// Query with options - customize behavior
 const { result: data } = api.query.getUsers({
   loadOnMount: true,
   debounce: 300,
@@ -278,25 +278,60 @@ Organize endpoints hierarchically for better code organization:
 
 ```typescript
 import { createApiClient, defineQuery, defineMutation } from 'vue-api-kit';
+import { z } from 'zod';
 
 const api = createApiClient({
   baseURL: 'https://api.example.com',
   queries: {
     users: {
-      getAll: defineQuery({ path: '/users', response: z.array(...) }),
-      getById: defineQuery({ path: '/users/{id}', params: z.object({ id: z.number() }), response: z.object(...) }),
-      search: defineQuery({ method: 'POST', path: '/users/search', data: z.object(...) })
+      getAll: defineQuery({
+        path: '/users',
+        response: z.array(z.object({ id: z.number(), name: z.string() }))
+      }),
+      getById: defineQuery({
+        path: '/users/{id}',
+        params: z.object({ id: z.number() }),
+        response: z.object({ id: z.number(), name: z.string() })
+      }),
+      search: defineQuery({
+        method: 'POST',
+        path: '/users/search',
+        data: z.object({ query: z.string() }),
+        response: z.array(z.object({ id: z.number(), name: z.string() }))
+      })
     },
     posts: {
-      getAll: defineQuery({ path: '/posts' }),
-      getById: defineQuery({ path: '/posts/{id}' })
+      getAll: defineQuery({
+        path: '/posts',
+        response: z.array(z.object({ id: z.number(), title: z.string() }))
+      }),
+      getById: defineQuery({
+        path: '/posts/{id}',
+        params: z.object({ id: z.number() }),
+        response: z.object({ id: z.number(), title: z.string() })
+      })
     }
   },
   mutations: {
     users: {
-      create: defineMutation({ method: 'POST', path: '/users', data: z.object(...) }),
-      update: defineMutation({ method: 'PUT', path: '/users/{id}', params: z.object({ id: z.number() }) }),
-      delete: defineMutation({ method: 'DELETE', path: '/users/{id}' })
+      create: defineMutation({
+        method: 'POST',
+        path: '/users',
+        data: z.object({ name: z.string(), email: z.string() }),
+        response: z.object({ id: z.number(), name: z.string() })
+      }),
+      update: defineMutation({
+        method: 'PUT',
+        path: '/users/{id}',
+        params: z.object({ id: z.number() }),
+        data: z.object({ name: z.string() }),
+        response: z.object({ id: z.number(), name: z.string() })
+      }),
+      delete: defineMutation({
+        method: 'DELETE',
+        path: '/users/{id}',
+        params: z.object({ id: z.number() })
+      })
     }
   }
 });
@@ -315,14 +350,27 @@ Split your API definitions across multiple files:
 **user-api.ts**
 ```typescript
 import { defineQuery, defineMutation } from 'vue-api-kit';
+import { z } from 'zod';
 
 export const userQueries = {
-  getUsers: defineQuery({ path: '/users', response: z.array(...) }),
-  getUser: defineQuery({ path: '/users/{id}', params: z.object({ id: z.number() }) })
+  getUsers: defineQuery({
+    path: '/users',
+    response: z.array(z.object({ id: z.number(), name: z.string() }))
+  }),
+  getUser: defineQuery({
+    path: '/users/{id}',
+    params: z.object({ id: z.number() }),
+    response: z.object({ id: z.number(), name: z.string() })
+  })
 };
 
 export const userMutations = {
-  createUser: defineMutation({ method: 'POST', path: '/users', data: z.object(...) })
+  createUser: defineMutation({
+    method: 'POST',
+    path: '/users',
+    data: z.object({ name: z.string(), email: z.string() }),
+    response: z.object({ id: z.number(), name: z.string() })
+  })
 };
 ```
 
