@@ -234,7 +234,50 @@ describe("Multipart Nested Object Support", () => {
     // null should be stringified
     expect(formData.get("product[description]")).toBe("null");
 
-    // undefined should be stringified
-    expect(formData.get("product[optional]")).toBe("undefined");
+    // undefined should NOT be included in FormData
+    expect(formData.get("product[optional]")).toBeNull();
+  });
+
+  it("should skip undefined file fields in multipart", async () => {
+    mockRequest.mockResolvedValue({
+      data: { success: true },
+    });
+
+    const api = createApiClient({
+      baseURL: "https://api.example.com",
+      mutations: {
+        uploadWithUndefinedFile: {
+          method: "POST",
+          path: "/upload",
+          isMultipart: true,
+          response: z.object({ success: z.boolean() }),
+        },
+      },
+    });
+
+    const { mutate } = api.mutation.uploadWithUndefinedFile();
+
+    await mutate({
+      data: {
+        code: "TEST001",
+        image: {
+          file: undefined,
+          url: "https://example.com/image.jpg",
+        },
+      },
+    });
+
+    expect(mockRequest).toHaveBeenCalled();
+    const formData = mockRequest.mock.calls[0][0].data;
+    expect(formData).toBeInstanceOf(FormData);
+
+    // Check that code is present
+    expect(formData.get("code")).toBe("TEST001");
+
+    // Check that url is present
+    expect(formData.get("image[url]")).toBe("https://example.com/image.jpg");
+
+    // undefined file should NOT be included in FormData
+    expect(formData.get("image[file]")).toBeNull();
   });
 });
