@@ -15,10 +15,7 @@ describe("Multipart Nested Object Support", () => {
           use: vi.fn((fn) => fn),
         },
         response: {
-          use: vi.fn((fn, errorFn) => {
-            if (fn) fn();
-            if (errorFn) errorFn();
-          }),
+          use: vi.fn(),
         },
       },
     } as any);
@@ -233,10 +230,10 @@ describe("Multipart Nested Object Support", () => {
 
     // Check that name is present
     expect(formData.get("product[name]")).toBe("Product Name");
-    
+
     // null should be stringified
     expect(formData.get("product[description]")).toBe("null");
-    
+
     // undefined should be stringified
     expect(formData.get("product[optional]")).toBe("undefined");
   });

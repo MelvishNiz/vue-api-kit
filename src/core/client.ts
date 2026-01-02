@@ -254,7 +254,7 @@ export function createApiClient<
     (res) => res,
     (error: AxiosError) => {
       nextTick(() => {
-        if (error.code === "ERR_CANCELED") return;
+        if (error?.code === "ERR_CANCELED") return;
       });
       return Promise.reject(error);
     }
@@ -516,7 +516,7 @@ export function createApiClient<
               // Handle multipart/form-data for file uploads
               if (m.isMultipart) {
                 const formData = new FormData();
-                
+
                 // Use the helper function to recursively flatten nested objects
                 for (const [key, value] of Object.entries(dataWithoutParams)) {
                   appendToFormData(formData, value, key);
