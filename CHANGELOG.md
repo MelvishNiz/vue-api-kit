@@ -1,3 +1,13 @@
+## [1.10.8](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.7...v1.10.8) (2026-01-02)
+
+### :bug: Fixes
+
+* error handling in Axios response interceptor for multipart nested object support ([ead1703](https://github.com/MelvishNiz/vue-api-kit/commit/ead1703ba3c9ae1613db8430fe1e5d76fd2c4863))
+
+### :zap: Refactor
+
+* rename onErrorRequest to onError for consistency across API client ([f466311](https://github.com/MelvishNiz/vue-api-kit/commit/f4663113b02fc6b94d65c7e7b3b97810bbeb735a))
+
 ## [1.10.7](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.6...v1.10.7) (2025-12-29)
 
 ### :bug: Fixes
