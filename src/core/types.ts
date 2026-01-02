@@ -132,7 +132,22 @@ export type MutationHooksFromDefinitions<M> = {
  *   csrfRefreshEndpoint: "/auth/refresh-csrf",
  *   queries: { getUsers: { path: "/users" } },
  *   mutations: { createUser: { method: "POST", path: "/users" } },
- *   onErrorRequest: (error) => console.error(error.message)
+ *   onBeforeRequest: async (config) => {
+ *    // Modify config before request
+ *     return config;
+ *   },
+ *   onStartRequest: async () => {
+ *     console.log("Request started");
+ *   },
+ *   onFinishRequest: async () => {
+ *     console.log("Request finished");
+ *   },
+ *   onError: ({ err, message }) => {
+ *     console.error("API Error:", message);
+ *   },
+ *   onZodError: (zodError) => {
+ *     console.error("Validation Error:", zodError);
+ *   }
  * };
  * @example
  * // Nested structure

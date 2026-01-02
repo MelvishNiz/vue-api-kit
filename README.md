@@ -235,7 +235,7 @@ async function handleSubmit() {
 - ✅ **POST Queries**: Support for both GET and POST methods in queries for complex data retrieval
 - ✅ **Modular APIs**: Merge queries and mutations from separate files with full type safety
 - ✅ **Multi-Level Nesting**: Organize queries and mutations in nested structures with full type safety
-- ✅ **File Upload**: Support for multipart/form-data in mutations
+- ✅ **File Upload**: Support for multipart/form-data with nested objects in mutations
 - ✅ **Path Parameters**: Automatic path parameter replacement
 - ✅ **Debouncing**: Built-in request debouncing
 - ✅ **CSRF Protection**: Automatic CSRF token refresh on 403/419 errors
@@ -434,7 +434,7 @@ const api = createApiClient({
     console.log('Request finished');
   },
 
-  onErrorRequest: (error) => {
+  onError: (error) => {
     // Global error handler
     console.error('API Error:', error.message);
   },
@@ -831,6 +831,66 @@ async function handleUpload(file: File) {
   await mutate({ data: { file } });
 }
 ```
+
+### Nested Objects in Multipart
+
+The multipart feature supports nested objects with automatic bracket notation flattening:
+
+```typescript
+const api = createApiClient({
+  baseURL: 'https://api.example.com',
+  mutations: {
+    createProduct: {
+      method: 'POST',
+      path: '/products',
+      isMultipart: true,
+      response: z.object({
+        id: z.number(),
+        success: z.boolean()
+      })
+    }
+  }
+});
+
+// In component
+const { mutate } = api.mutation.createProduct();
+
+async function handleSubmit(file: File) {
+  await mutate({
+    data: {
+      code: 'PROD001',
+      name: 'Product Name',
+      description: 'Product description',
+      // Nested objects are automatically flattened with bracket notation
+      image: {
+        file_url: 'https://example.com/existing.jpg',
+        file: file
+      }
+    }
+  });
+}
+
+// The FormData will be sent as:
+// code=PROD001
+// name=Product Name
+// description=Product description
+// image[file_url]=https://example.com/existing.jpg
+// image[file]=<File>
+```
+
+You can also use flat bracket notation directly:
+
+```typescript
+await mutate({
+  data: {
+    'image[file]': file,
+    'image[file_url]': 'https://example.com/existing.jpg',
+    code: 'PROD001'
+  }
+});
+```
+
+Both approaches work seamlessly together, giving you flexibility in how you structure your data.
 
 ## 🔒 CSRF Token Protection
 

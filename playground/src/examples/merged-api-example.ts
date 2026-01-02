@@ -31,8 +31,8 @@ export const api = createApiClient({
     return config;
   },
 
-  onErrorRequest: ({ message, status }) => {
-    console.error(`API Error [${status}]: ${message}`);
+  onError: ({ message }) => {
+    console.error(`API Error: ${message}`);
   },
 });
 
