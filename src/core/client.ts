@@ -23,6 +23,41 @@ function isApiMutation(obj: any): obj is ApiMutation {
   return obj && typeof obj === 'object' && obj !== null && typeof obj.path === 'string' && typeof obj.method === 'string';
 }
 
+/**
+ * Recursively flatten nested objects for FormData with bracket notation
+ * @param formData - The FormData instance to append to
+ * @param data - The data object to flatten
+ * @param parentKey - The parent key for nested properties (used in recursion)
+ * @example
+ * Input: { image: { file: File, url: "http://..." } }
+ * Output: FormData with "image[file]" and "image[url]"
+ */
+function appendToFormData(formData: FormData, data: any, parentKey: string = ''): void {
+  if (data instanceof File || data instanceof Blob) {
+    formData.append(parentKey, data);
+  } else if (Array.isArray(data)) {
+    data.forEach((item) => {
+      if (item instanceof File || item instanceof Blob) {
+        formData.append(parentKey, item);
+      } else if (typeof item === 'object' && item !== null) {
+        // For nested objects in arrays, we still use bracket notation
+        appendToFormData(formData, item, parentKey);
+      } else {
+        formData.append(parentKey, String(item));
+      }
+    });
+  } else if (typeof data === 'object' && data !== null) {
+    // Recursively handle nested objects
+    for (const [key, value] of Object.entries(data)) {
+      const formKey = parentKey ? `${parentKey}[${key}]` : key;
+      appendToFormData(formData, value, formKey);
+    }
+  } else {
+    // Primitive values (string, number, boolean, null, undefined)
+    formData.append(parentKey, String(data));
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 /*                              CREATE API CLIENT                              */
 /* -------------------------------------------------------------------------- */
@@ -481,24 +516,10 @@ export function createApiClient<
               // Handle multipart/form-data for file uploads
               if (m.isMultipart) {
                 const formData = new FormData();
-
+                
+                // Use the helper function to recursively flatten nested objects
                 for (const [key, value] of Object.entries(dataWithoutParams)) {
-                  if (value instanceof File || value instanceof Blob) {
-                    formData.append(key, value);
-                  } else if (Array.isArray(value)) {
-                    // Handle array of files
-                    value.forEach((item) => {
-                      if (item instanceof File || item instanceof Blob) {
-                        formData.append(key, item);
-                      } else {
-                        formData.append(key, JSON.stringify(item));
-                      }
-                    });
-                  } else if (typeof value === 'object' && value !== null) {
-                    formData.append(key, JSON.stringify(value));
-                  } else {
-                    formData.append(key, String(value));
-                  }
+                  appendToFormData(formData, value, key);
                 }
 
                 requestData = formData;
