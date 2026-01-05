@@ -335,4 +335,53 @@ describe("Multipart Nested Object Support", () => {
     expect(formData.get("members_form[members][1][user][phone]")).toBe("9876543210");
     expect(formData.get("members_form[members][1][role]")).toBe("member");
   });
+
+  it("should handle arrays of objects with various field names", async () => {
+    mockRequest.mockResolvedValue({
+      data: { success: true },
+    });
+
+    const api = createApiClient({
+      baseURL: "https://api.example.com",
+      mutations: {
+        submitFormWithArrays: {
+          method: "POST",
+          path: "/submit",
+          isMultipart: true,
+          response: z.object({ success: z.boolean() }),
+        },
+      },
+    });
+
+    const { mutate } = api.mutation.submitFormWithArrays();
+
+    await mutate({
+      data: {
+        products: [
+          { name: "Product A", price: 100 },
+          { name: "Product B", price: 200 },
+        ],
+        categories: [
+          { id: 1, title: "Category 1" },
+          { id: 2, title: "Category 2" },
+        ],
+      },
+    });
+
+    expect(mockRequest).toHaveBeenCalled();
+    const formData = mockRequest.mock.calls[0][0].data;
+    expect(formData).toBeInstanceOf(FormData);
+
+    // Check products array
+    expect(formData.get("products[0][name]")).toBe("Product A");
+    expect(formData.get("products[0][price]")).toBe("100");
+    expect(formData.get("products[1][name]")).toBe("Product B");
+    expect(formData.get("products[1][price]")).toBe("200");
+
+    // Check categories array
+    expect(formData.get("categories[0][id]")).toBe("1");
+    expect(formData.get("categories[0][title]")).toBe("Category 1");
+    expect(formData.get("categories[1][id]")).toBe("2");
+    expect(formData.get("categories[1][title]")).toBe("Category 2");
+  });
 });
