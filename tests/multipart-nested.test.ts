@@ -152,7 +152,9 @@ describe("Multipart Nested Object Support", () => {
 
     // Check that arrays in nested objects are handled correctly
     expect(formData.getAll("images[files]")).toEqual([file1, file2]);
-    expect(formData.getAll("images[alt_texts]")).toEqual(["Alt 1", "Alt 2"]);
+    // Primitive values in arrays now have indices
+    expect(formData.get("images[alt_texts][0]")).toBe("Alt 1");
+    expect(formData.get("images[alt_texts][1]")).toBe("Alt 2");
   });
 
   it("should handle mixed flat and nested structure", async () => {
@@ -279,5 +281,162 @@ describe("Multipart Nested Object Support", () => {
 
     // undefined file should NOT be included in FormData
     expect(formData.get("image[file]")).toBeNull();
+  });
+
+  it("should handle arrays of objects with proper indexing", async () => {
+    mockRequest.mockResolvedValue({
+      data: { success: true },
+    });
+
+    const api = createApiClient({
+      baseURL: "https://api.example.com",
+      mutations: {
+        uploadWithArrayOfObjects: {
+          method: "POST",
+          path: "/upload",
+          isMultipart: true,
+          response: z.object({ success: z.boolean() }),
+        },
+      },
+    });
+
+    const { mutate } = api.mutation.uploadWithArrayOfObjects();
+
+    await mutate({
+      data: {
+        members_form: {
+          members: [
+            {
+              user: {
+                country_code: "US",
+                phone: "1234567890",
+              },
+              role: "admin",
+            },
+            {
+              user: {
+                country_code: "ID",
+                phone: "9876543210",
+              },
+              role: "member",
+            },
+          ],
+        },
+      },
+    });
+
+    expect(mockRequest).toHaveBeenCalled();
+    const formData = mockRequest.mock.calls[0][0].data;
+    expect(formData).toBeInstanceOf(FormData);
+
+    // Check that array indices are included for objects in arrays
+    expect(formData.get("members_form[members][0][user][country_code]")).toBe("US");
+    expect(formData.get("members_form[members][0][user][phone]")).toBe("1234567890");
+    expect(formData.get("members_form[members][0][role]")).toBe("admin");
+    expect(formData.get("members_form[members][1][user][country_code]")).toBe("ID");
+    expect(formData.get("members_form[members][1][user][phone]")).toBe("9876543210");
+    expect(formData.get("members_form[members][1][role]")).toBe("member");
+  });
+
+  it("should handle arrays of objects with various field names", async () => {
+    mockRequest.mockResolvedValue({
+      data: { success: true },
+    });
+
+    const api = createApiClient({
+      baseURL: "https://api.example.com",
+      mutations: {
+        submitFormWithArrays: {
+          method: "POST",
+          path: "/submit",
+          isMultipart: true,
+          response: z.object({ success: z.boolean() }),
+        },
+      },
+    });
+
+    const { mutate } = api.mutation.submitFormWithArrays();
+
+    await mutate({
+      data: {
+        products: [
+          { name: "Product A", price: 100 },
+          { name: "Product B", price: 200 },
+        ],
+        categories: [
+          { id: 1, title: "Category 1" },
+          { id: 2, title: "Category 2" },
+        ],
+      },
+    });
+
+    expect(mockRequest).toHaveBeenCalled();
+    const formData = mockRequest.mock.calls[0][0].data;
+    expect(formData).toBeInstanceOf(FormData);
+
+    // Check products array
+    expect(formData.get("products[0][name]")).toBe("Product A");
+    expect(formData.get("products[0][price]")).toBe("100");
+    expect(formData.get("products[1][name]")).toBe("Product B");
+    expect(formData.get("products[1][price]")).toBe("200");
+
+    // Check categories array
+    expect(formData.get("categories[0][id]")).toBe("1");
+    expect(formData.get("categories[0][title]")).toBe("Category 1");
+    expect(formData.get("categories[1][id]")).toBe("2");
+    expect(formData.get("categories[1][title]")).toBe("Category 2");
+  });
+
+  it("should handle nested arrays of primitives with indices", async () => {
+    mockRequest.mockResolvedValue({
+      data: { success: true },
+    });
+
+    const api = createApiClient({
+      baseURL: "https://api.example.com",
+      mutations: {
+        submitNestedArrays: {
+          method: "POST",
+          path: "/submit",
+          isMultipart: true,
+          response: z.object({ success: z.boolean() }),
+        },
+      },
+    });
+
+    const { mutate } = api.mutation.submitNestedArrays();
+
+    await mutate({
+      data: {
+        test: [
+          {
+            nested: {
+              value: 'test',
+              member: [
+                "123123",
+                "asdasd",
+                "ggawdawd"
+              ]
+            }
+          },
+          {
+            nested: {
+              value: 'test2'
+            }
+          }
+        ]
+      },
+    });
+
+    expect(mockRequest).toHaveBeenCalled();
+    const formData = mockRequest.mock.calls[0][0].data;
+    expect(formData).toBeInstanceOf(FormData);
+
+    // Check that nested arrays of primitives have indices
+    expect(formData.get("test[0][nested][value]")).toBe("test");
+    expect(formData.get("test[0][nested][member][0]")).toBe("123123");
+    expect(formData.get("test[0][nested][member][1]")).toBe("asdasd");
+    expect(formData.get("test[0][nested][member][2]")).toBe("ggawdawd");
+    expect(formData.get("test[1][nested][value]")).toBe("test2");
   });
 });
