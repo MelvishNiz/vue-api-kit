@@ -49,8 +49,9 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
         const indexedKey = `${parentKey}[${index}]`;
         appendToFormData(formData, item, indexedKey);
       } else if (item !== undefined) {
-        // Skip undefined items in arrays
-        formData.append(parentKey, String(item));
+        // For primitive values in arrays, also add array index
+        const indexedKey = `${parentKey}[${index}]`;
+        formData.append(indexedKey, String(item));
       }
     });
   } else if (typeof data === 'object' && data !== null) {

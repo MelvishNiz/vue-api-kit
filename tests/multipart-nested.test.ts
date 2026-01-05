@@ -152,7 +152,9 @@ describe("Multipart Nested Object Support", () => {
 
     // Check that arrays in nested objects are handled correctly
     expect(formData.getAll("images[files]")).toEqual([file1, file2]);
-    expect(formData.getAll("images[alt_texts]")).toEqual(["Alt 1", "Alt 2"]);
+    // Primitive values in arrays now have indices
+    expect(formData.get("images[alt_texts][0]")).toBe("Alt 1");
+    expect(formData.get("images[alt_texts][1]")).toBe("Alt 2");
   });
 
   it("should handle mixed flat and nested structure", async () => {
@@ -383,5 +385,58 @@ describe("Multipart Nested Object Support", () => {
     expect(formData.get("categories[0][title]")).toBe("Category 1");
     expect(formData.get("categories[1][id]")).toBe("2");
     expect(formData.get("categories[1][title]")).toBe("Category 2");
+  });
+
+  it("should handle nested arrays of primitives with indices", async () => {
+    mockRequest.mockResolvedValue({
+      data: { success: true },
+    });
+
+    const api = createApiClient({
+      baseURL: "https://api.example.com",
+      mutations: {
+        submitNestedArrays: {
+          method: "POST",
+          path: "/submit",
+          isMultipart: true,
+          response: z.object({ success: z.boolean() }),
+        },
+      },
+    });
+
+    const { mutate } = api.mutation.submitNestedArrays();
+
+    await mutate({
+      data: {
+        test: [
+          {
+            nested: {
+              value: 'test',
+              member: [
+                "123123",
+                "asdasd",
+                "ggawdawd"
+              ]
+            }
+          },
+          {
+            nested: {
+              value: 'test2'
+            }
+          }
+        ]
+      },
+    });
+
+    expect(mockRequest).toHaveBeenCalled();
+    const formData = mockRequest.mock.calls[0][0].data;
+    expect(formData).toBeInstanceOf(FormData);
+
+    // Check that nested arrays of primitives have indices
+    expect(formData.get("test[0][nested][value]")).toBe("test");
+    expect(formData.get("test[0][nested][member][0]")).toBe("123123");
+    expect(formData.get("test[0][nested][member][1]")).toBe("asdasd");
+    expect(formData.get("test[0][nested][member][2]")).toBe("ggawdawd");
+    expect(formData.get("test[1][nested][value]")).toBe("test2");
   });
 });
