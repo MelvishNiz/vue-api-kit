@@ -1,3 +1,14 @@
+## [1.10.10](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.9...v1.10.10) (2026-01-05)
+
+### :bug: Fixes
+
+* add array indices to multipart nested objects in FormData ([84c95ad](https://github.com/MelvishNiz/vue-api-kit/commit/84c95add68837e78dc436d9a756ded96f9deb446))
+* add array indices to primitive values in arrays for multipart FormData ([73151f4](https://github.com/MelvishNiz/vue-api-kit/commit/73151f4b047f0b870d5ac22c466425c0b7b51286))
+
+### :white_check_mark: Tests
+
+* add comprehensive test for various array field names ([1669df6](https://github.com/MelvishNiz/vue-api-kit/commit/1669df6c499675d1d66b8a99933ead484d5f159c))
+
 ## [1.10.9](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.8...v1.10.9) (2026-01-02)
 
 ### :bug: Fixes
