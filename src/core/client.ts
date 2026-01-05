@@ -41,12 +41,13 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
   if (data instanceof File || data instanceof Blob) {
     formData.append(parentKey, data);
   } else if (Array.isArray(data)) {
-    data.forEach((item) => {
+    data.forEach((item, index) => {
       if (item instanceof File || item instanceof Blob) {
         formData.append(parentKey, item);
       } else if (typeof item === 'object' && item !== null) {
-        // For nested objects in arrays, we still use bracket notation
-        appendToFormData(formData, item, parentKey);
+        // For nested objects in arrays, add array index to bracket notation
+        const indexedKey = `${parentKey}[${index}]`;
+        appendToFormData(formData, item, indexedKey);
       } else if (item !== undefined) {
         // Skip undefined items in arrays
         formData.append(parentKey, String(item));

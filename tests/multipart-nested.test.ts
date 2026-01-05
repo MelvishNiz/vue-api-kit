@@ -280,4 +280,59 @@ describe("Multipart Nested Object Support", () => {
     // undefined file should NOT be included in FormData
     expect(formData.get("image[file]")).toBeNull();
   });
+
+  it("should handle arrays of objects with proper indexing", async () => {
+    mockRequest.mockResolvedValue({
+      data: { success: true },
+    });
+
+    const api = createApiClient({
+      baseURL: "https://api.example.com",
+      mutations: {
+        uploadWithArrayOfObjects: {
+          method: "POST",
+          path: "/upload",
+          isMultipart: true,
+          response: z.object({ success: z.boolean() }),
+        },
+      },
+    });
+
+    const { mutate } = api.mutation.uploadWithArrayOfObjects();
+
+    await mutate({
+      data: {
+        members_form: {
+          members: [
+            {
+              user: {
+                country_code: "US",
+                phone: "1234567890",
+              },
+              role: "admin",
+            },
+            {
+              user: {
+                country_code: "ID",
+                phone: "9876543210",
+              },
+              role: "member",
+            },
+          ],
+        },
+      },
+    });
+
+    expect(mockRequest).toHaveBeenCalled();
+    const formData = mockRequest.mock.calls[0][0].data;
+    expect(formData).toBeInstanceOf(FormData);
+
+    // Check that array indices are included for objects in arrays
+    expect(formData.get("members_form[members][0][user][country_code]")).toBe("US");
+    expect(formData.get("members_form[members][0][user][phone]")).toBe("1234567890");
+    expect(formData.get("members_form[members][0][role]")).toBe("admin");
+    expect(formData.get("members_form[members][1][user][country_code]")).toBe("ID");
+    expect(formData.get("members_form[members][1][user][phone]")).toBe("9876543210");
+    expect(formData.get("members_form[members][1][role]")).toBe("member");
+  });
 });
