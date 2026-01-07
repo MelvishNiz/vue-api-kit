@@ -424,7 +424,7 @@ const userQueries = {
     path: '/users/search',
     data: z.object({ query: z.string() }),
     response: z.array(UserSchema),
-    onBeforeRequest: (config) => {
+    onBeforeRequest: async (config) => {
       // Fetch and add fresh token
       const token = await refreshAuthToken();
       config.headers.Authorization = `Bearer ${token}`;

@@ -169,7 +169,7 @@ export const mutationsWithOnBeforeRequest = {
  * const { mutate } = api.mutation.createPost({
  *   onBeforeRequest: (config) => {
  *     // Add runtime-specific headers
- *     const sessionId = getSessionId();
+ *     const sessionId = 'session_' + Math.random().toString(36).slice(2, 11);
  *     config.headers['X-Session-ID'] = sessionId;
  *     return config;
  *   }
@@ -206,12 +206,7 @@ async function fetchFreshToken(): Promise<string> {
 }
 
 function generateRequestId(): string {
-  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
-
-function getSessionId(): string {
-  // In a real app, get from localStorage or session storage
-  return 'session_' + Math.random().toString(36).substr(2, 9);
+  return `req_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 }
 
 /* ============================================================================
