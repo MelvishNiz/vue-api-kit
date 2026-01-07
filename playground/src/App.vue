@@ -8,6 +8,7 @@ import UpdatePost from './components/UpdatePost.vue';
 import DeletePost from './components/DeletePost.vue';
 import UploadImage from './components/UploadImage.vue';
 import LoginPost from './components/LoginPost.vue';
+import OnBeforeRequestDemo from './components/OnBeforeRequestDemo.vue';
 
 const activeTab = ref('posts');
 
@@ -20,6 +21,7 @@ const tabs = [
   { id: 'delete', name: 'Delete Post', icon: '🗑️' },
   { id: 'upload', name: 'Upload Image', icon: '📤' },
   { id: 'login', name: 'Login', icon: '🔐' },
+  { id: 'headers', name: 'Custom Headers', icon: '🔧' },
 ];
 </script>
 
@@ -62,6 +64,7 @@ const tabs = [
         <DeletePost v-if="activeTab === 'delete'" />
         <UploadImage v-if="activeTab === 'upload'" />
         <LoginPost v-if="activeTab === 'login'" />
+        <OnBeforeRequestDemo v-if="activeTab === 'headers'" />
       </div>
 
       <!-- Footer -->

@@ -391,10 +391,10 @@ export const api = createApiClient({
 
 ### Request Interceptors
 
-Add interceptors at global, definition, or runtime level:
+Add interceptors at global, definition, or runtime level to modify headers and request configuration:
 
 ```typescript
-// 1. Global interceptor
+// 1. Global interceptor - applies to ALL requests
 const api = createApiClient({
   baseURL: 'https://api.example.com',
   onBeforeRequest: async (config) => {
@@ -403,28 +403,69 @@ const api = createApiClient({
   }
 });
 
-// 2. Definition-level interceptor
-queries: {
-  getUser: {
+// 2. Definition-level interceptor - using defineQuery
+import { defineQuery, defineMutation } from 'vue-api-kit';
+
+const userQueries = {
+  getProtectedUser: defineQuery({
     path: '/users/{id}',
+    params: z.object({ id: z.number() }),
+    response: UserSchema,
     onBeforeRequest: async (config) => {
-      config.headers['X-Custom-Header'] = 'value';
+      // Add special headers for this specific endpoint
+      config.headers['X-API-Key'] = 'your-api-key';
+      config.headers['X-Custom-Auth'] = 'Bearer special-token';
       return config;
     }
-  }
-}
+  }),
+  
+  searchUsers: defineQuery({
+    method: 'POST',
+    path: '/users/search',
+    data: z.object({ query: z.string() }),
+    response: z.array(UserSchema),
+    onBeforeRequest: (config) => {
+      // Fetch and add fresh token
+      const token = await refreshAuthToken();
+      config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    }
+  })
+};
 
-// 3. Runtime interceptor
+const userMutations = {
+  createUser: defineMutation({
+    method: 'POST',
+    path: '/users',
+    data: CreateUserSchema,
+    response: UserSchema,
+    onBeforeRequest: (config) => {
+      // Add request tracking headers
+      config.headers['X-Request-ID'] = generateRequestId();
+      config.headers['X-Timestamp'] = new Date().toISOString();
+      return config;
+    }
+  })
+};
+
+// 3. Runtime interceptor - specific to one call
 const { result } = api.query.getUser({
   params: { id: 1 },
   onBeforeRequest: async (config) => {
+    // Add runtime-specific headers
     config.headers.Authorization = `Bearer ${await refreshToken()}`;
+    config.headers['X-User-Context'] = getCurrentUserId();
     return config;
   }
 });
 ```
 
 **Execution order:** Global → Definition → Runtime
+
+**Use cases:**
+- **Global**: Authentication tokens, app version headers, CSRF tokens
+- **Definition**: Endpoint-specific API keys, content versioning, rate limiting
+- **Runtime**: User-specific tokens, dynamic context, request-specific tracking
 
 ### File Upload
 
