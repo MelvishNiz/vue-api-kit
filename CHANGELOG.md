@@ -1,3 +1,9 @@
+## [1.10.11](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.10...v1.10.11) (2026-01-07)
+
+### :bug: Fixes
+
+* **core:** can't attach headers on query ([af72f5a](https://github.com/MelvishNiz/vue-api-kit/commit/af72f5a1a94e5b4044fd127deb15088423461561))
+
 ## [1.10.10](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.9...v1.10.10) (2026-01-05)
 
 ### :bug: Fixes
