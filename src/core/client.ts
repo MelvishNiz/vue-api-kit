@@ -37,7 +37,7 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
   if (data === undefined) {
     return;
   }
-  
+
   if (data instanceof File || data instanceof Blob) {
     formData.append(parentKey, data);
   } else if (Array.isArray(data)) {
@@ -347,6 +347,7 @@ export function createApiClient<
                 url: q.path,
                 params: queryOptions?.params,
                 signal: abortController.signal,
+                headers: {},
               };
 
               // Only add data for POST queries
