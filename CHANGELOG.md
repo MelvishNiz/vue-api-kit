@@ -1,3 +1,9 @@
+## [1.11.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.11...v1.11.0) (2026-02-13)
+
+### :sparkles: Features
+
+* **client:** add log Zod validation errors with method and path ([3f521c9](https://github.com/MelvishNiz/vue-api-kit/commit/3f521c9d50ce364033144e74688187f3608c9ed8))
+
 ## [1.10.11](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.10...v1.10.11) (2026-01-07)
 
 ### :bug: Fixes
