@@ -398,6 +398,7 @@ export function createApiClient<
                   options.onError?.({ err, message });
                 }
               } else if (err instanceof ZodError) {
+                console.warn("Zod validation error at:", q.method, q.path);
                 // Handle Zod validation errors
                 zodError.value = z.flattenError(err);
                 const length = Object.keys(zodError.value.fieldErrors).length;
