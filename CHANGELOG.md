@@ -1,3 +1,10 @@
+## [1.12.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.11.0...v1.12.0) (2026-02-18)
+
+### :sparkles: Features
+
+* **core:** enhance appendToFormData to handle Date and boolean types ([d4a6359](https://github.com/MelvishNiz/vue-api-kit/commit/d4a6359705fc9bd334bb589ff60db6ddc93de9ca))
+* **tests:** add tests for preserving date values and serializing booleans in multipart requests ([b9a7339](https://github.com/MelvishNiz/vue-api-kit/commit/b9a7339f8dc1c62cd9bd65554891a351669f295a))
+
 ## [1.11.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.10.11...v1.11.0) (2026-02-13)
 
 ### :sparkles: Features
