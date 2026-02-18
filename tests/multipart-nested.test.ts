@@ -151,10 +151,53 @@ describe("Multipart Nested Object Support", () => {
     expect(formData).toBeInstanceOf(FormData);
 
     // Check that arrays in nested objects are handled correctly
-    expect(formData.getAll("images[files]")).toEqual([file1, file2]);
+    expect(formData.get("images[files][0]")).toBe(file1);
+    expect(formData.get("images[files][1]")).toBe(file2);
     // Primitive values in arrays now have indices
     expect(formData.get("images[alt_texts][0]")).toBe("Alt 1");
     expect(formData.get("images[alt_texts][1]")).toBe("Alt 2");
+  });
+
+  it("should preserve date values and serialize booleans consistently", async () => {
+    mockRequest.mockResolvedValue({
+      data: { success: true },
+    });
+
+    const api = createApiClient({
+      baseURL: "https://api.example.com",
+      mutations: {
+        uploadTypedFields: {
+          method: "POST",
+          path: "/upload",
+          isMultipart: true,
+          response: z.object({ success: z.boolean() }),
+        },
+      },
+    });
+
+    const publishedAt = new Date("2025-02-14T10:30:00.000Z");
+    const { mutate } = api.mutation.uploadTypedFields();
+
+    await mutate({
+      data: {
+        metadata: {
+          is_active: true,
+          published_at: publishedAt,
+        },
+        flags: [true, false],
+        schedule: [publishedAt],
+      },
+    });
+
+    expect(mockRequest).toHaveBeenCalled();
+    const formData = mockRequest.mock.calls[0][0].data;
+    expect(formData).toBeInstanceOf(FormData);
+
+    expect(formData.get("metadata[is_active]")).toBe("true");
+    expect(formData.get("metadata[published_at]")).toBe(publishedAt.toISOString());
+    expect(formData.get("flags[0]")).toBe("true");
+    expect(formData.get("flags[1]")).toBe("false");
+    expect(formData.get("schedule[0]")).toBe(publishedAt.toISOString());
   });
 
   it("should handle mixed flat and nested structure", async () => {
