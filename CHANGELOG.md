@@ -1,3 +1,9 @@
+## [1.12.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.12.0...v1.12.1) (2026-02-18)
+
+### :bug: Fixes
+
+* **core:** let boolean parsing on multipart ([f7ffea2](https://github.com/MelvishNiz/vue-api-kit/commit/f7ffea2ff971812b188a0192e41a910703c02ca1))
+
 ## [1.12.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.11.0...v1.12.0) (2026-02-18)
 
 ### :sparkles: Features
