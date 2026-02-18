@@ -40,17 +40,24 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
 
   if (data instanceof File || data instanceof Blob) {
     formData.append(parentKey, data);
+  } else if (data instanceof Date) {
+    formData.append(parentKey, data.toISOString());
   } else if (Array.isArray(data)) {
     data.forEach((item, index) => {
+      const indexedKey = `${parentKey}[${index}]`;
+
       if (item instanceof File || item instanceof Blob) {
-        formData.append(parentKey, item);
+        formData.append(indexedKey, item);
+      } else if (item instanceof Date) {
+        formData.append(indexedKey, item.toISOString());
       } else if (typeof item === 'object' && item !== null) {
-        // For nested objects in arrays, add array index to bracket notation
-        const indexedKey = `${parentKey}[${index}]`;
         appendToFormData(formData, item, indexedKey);
       } else if (item !== undefined) {
-        // For primitive values in arrays, also add array index
-        const indexedKey = `${parentKey}[${index}]`;
+        if (typeof item === 'boolean') {
+          formData.append(indexedKey, item ? 'true' : 'false');
+          return;
+        }
+
         formData.append(indexedKey, String(item));
       }
     });
@@ -62,6 +69,11 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
     }
   } else {
     // Primitive values (string, number, boolean, null)
+    if (typeof data === 'boolean') {
+      formData.append(parentKey, data ? 'true' : 'false');
+      return;
+    }
+
     formData.append(parentKey, String(data));
   }
 }
