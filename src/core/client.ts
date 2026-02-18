@@ -53,12 +53,8 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
       } else if (typeof item === 'object' && item !== null) {
         appendToFormData(formData, item, indexedKey);
       } else if (item !== undefined) {
-        if (typeof item === 'boolean') {
-          formData.append(indexedKey, item ? 'true' : 'false');
-          return;
-        }
-
-        formData.append(indexedKey, String(item));
+        // Let FormData handle primitive coercion natively
+        formData.append(indexedKey, item as any);
       }
     });
   } else if (typeof data === 'object' && data !== null) {
@@ -69,12 +65,8 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
     }
   } else {
     // Primitive values (string, number, boolean, null)
-    if (typeof data === 'boolean') {
-      formData.append(parentKey, data ? 'true' : 'false');
-      return;
-    }
-
-    formData.append(parentKey, String(data));
+    // Let FormData handle primitive coercion natively
+    formData.append(parentKey, data as any);
   }
 }
 
