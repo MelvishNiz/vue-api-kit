@@ -76,6 +76,7 @@ export interface ApiMutation<
   data?: TData;
   response?: TResponse;
   isMultipart?: boolean;
+  multipartBooleanStyle?: "trueFalse" | "numeric";
   onBeforeRequest?: (config: InternalAxiosRequestConfig<any>) => Promise<any> | void | any;
 }
 

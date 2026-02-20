@@ -200,6 +200,47 @@ describe("Multipart Nested Object Support", () => {
     expect(formData.get("schedule[0]")).toBe(publishedAt.toISOString());
   });
 
+  it("should serialize booleans as 0/1 for Laravel multipart when configured", async () => {
+    mockRequest.mockResolvedValue({
+      data: { success: true },
+    });
+
+    const api = createApiClient({
+      baseURL: "https://api.example.com",
+      mutations: {
+        uploadTypedFieldsLaravel: {
+          method: "POST",
+          path: "/upload",
+          isMultipart: true,
+          multipartBooleanStyle: "numeric",
+          response: z.object({ success: z.boolean() }),
+        },
+      },
+    });
+
+    const { mutate } = api.mutation.uploadTypedFieldsLaravel();
+
+    await mutate({
+      data: {
+        metadata: {
+          is_active: true,
+          is_draft: false,
+        },
+        flags: [true, false],
+      },
+    });
+
+    expect(mockRequest).toHaveBeenCalled();
+    const formData = mockRequest.mock.calls[0][0].data;
+    expect(formData).toBeInstanceOf(FormData);
+
+    expect(formData.get("metadata[is_active]")).toBe("1");
+    expect(formData.get("metadata[is_draft]")).toBe("0");
+    expect(formData.get("flags[0]")).toBe("1");
+    expect(formData.get("flags[1]")).toBe("0");
+  });
+
+
   it("should handle mixed flat and nested structure", async () => {
     mockRequest.mockResolvedValue({
       data: { success: true },

@@ -32,7 +32,12 @@ function isApiMutation(obj: any): obj is ApiMutation {
  * Input: { image: { file: File, url: "http://..." } }
  * Output: FormData with "image[file]" and "image[url]"
  */
-function appendToFormData(formData: FormData, data: any, parentKey: string = ''): void {
+function appendToFormData(
+  formData: FormData,
+  data: any,
+  parentKey: string = '',
+  multipartBooleanStyle: "trueFalse" | "numeric" = "trueFalse"
+): void {
   // Skip undefined values - they should not be included in FormData
   if (data === undefined) {
     return;
@@ -42,6 +47,8 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
     formData.append(parentKey, data);
   } else if (data instanceof Date) {
     formData.append(parentKey, data.toISOString());
+  } else if (typeof data === 'boolean') {
+    formData.append(parentKey, multipartBooleanStyle === 'numeric' ? (data ? '1' : '0') : String(data));
   } else if (Array.isArray(data)) {
     data.forEach((item, index) => {
       const indexedKey = `${parentKey}[${index}]`;
@@ -50,8 +57,10 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
         formData.append(indexedKey, item);
       } else if (item instanceof Date) {
         formData.append(indexedKey, item.toISOString());
+      } else if (typeof item === 'boolean') {
+        formData.append(indexedKey, multipartBooleanStyle === 'numeric' ? (item ? '1' : '0') : String(item));
       } else if (typeof item === 'object' && item !== null) {
-        appendToFormData(formData, item, indexedKey);
+        appendToFormData(formData, item, indexedKey, multipartBooleanStyle);
       } else if (item !== undefined) {
         // Let FormData handle primitive coercion natively
         formData.append(indexedKey, item as any);
@@ -61,7 +70,7 @@ function appendToFormData(formData: FormData, data: any, parentKey: string = '')
     // Recursively handle nested objects
     for (const [key, value] of Object.entries(data)) {
       const formKey = parentKey ? `${parentKey}[${key}]` : key;
-      appendToFormData(formData, value, formKey);
+      appendToFormData(formData, value, formKey, multipartBooleanStyle);
     }
   } else {
     // Primitive values (string, number, boolean, null)
@@ -530,10 +539,11 @@ export function createApiClient<
               // Handle multipart/form-data for file uploads
               if (m.isMultipart) {
                 const formData = new FormData();
+                const multipartBooleanStyle = m.multipartBooleanStyle ?? 'trueFalse';
 
                 // Use the helper function to recursively flatten nested objects
                 for (const [key, value] of Object.entries(dataWithoutParams)) {
-                  appendToFormData(formData, value, key);
+                  appendToFormData(formData, value, key, multipartBooleanStyle);
                 }
 
                 requestData = formData;

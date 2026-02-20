@@ -436,6 +436,8 @@ mutations: {
     method: 'POST',
     path: '/upload',
     isMultipart: true,
+    // Optional: Laravel-friendly boolean serialization in multipart (true => "1", false => "0")
+    multipartBooleanStyle: 'numeric',
     response: z.object({ url: z.string() })
   }
 }
