@@ -1,3 +1,9 @@
+## [1.13.0](https://github.com/MelvishNiz/vue-api-kit/compare/v1.12.1...v1.13.0) (2026-02-20)
+
+### :sparkles: Features
+
+* **core:** add support for configurable boolean serialization in multipart requests ([3d600d4](https://github.com/MelvishNiz/vue-api-kit/commit/3d600d48b3a7b4ae9761c379465894a3f092de05))
+
 ## [1.12.1](https://github.com/MelvishNiz/vue-api-kit/compare/v1.12.0...v1.12.1) (2026-02-18)
 
 ### :bug: Fixes
